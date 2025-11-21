@@ -294,65 +294,31 @@ const Dashboard = () => {
               <Typography>{exercise.name}</Typography>
               <Typography variant="body2" color="text.secondary">{exercise.time}</Typography>
             </Box>
-            {loading ? (
-              <Box display="flex" justifyContent="center" p={4}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
-                {recentActivities.map((activity) => (
-                  <Box
-                    key={activity.id}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      py: 1.5,
-                      px: 1,
-                      borderRadius: 1,
-                      '&:hover': {
-                        backgroundColor: 'action.hover',
-                      },
-                      mb: 1,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        backgroundColor: 'primary.light',
-                        color: 'primary.contrastText',
-                        borderRadius: '50%',
-                        minWidth: 36,
-                        width: 36,
-                        height: 36,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mr: 2,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {activity.type === 'task' ? (
-                        <AssignmentIcon fontSize="small" />
-                      ) : activity.type === 'team' ? (
-                        <GroupIcon fontSize="small" />
-                      ) : (
-                        <TrendingUpIcon fontSize="small" />
-                      )}
-                    </Box>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography variant="subtitle2" fontWeight="medium" noWrap>
-                        {activity.title}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {activity.time}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            )}
-          </StyledPaper>
-        </Grid>
-      </Grid>
+          ))}
+          
+          {loading ? (
+            <Box display="flex" justifyContent="center" p={4}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Recent Activities
+              </Typography>
+              {activities.map((activity) => (
+                <ActivityItem
+                  key={activity.id}
+                  title={activity.title}
+                  time={activity.time}
+                  value={activity.value}
+                  icon={activity.icon}
+                  color={activity.color}
+                />
+              ))}
+            </Box>
+          )}
+        </Box>
+      </Card>
     </Box>
   );
 };
