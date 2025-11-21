@@ -31,7 +31,21 @@ import {
   Snackbar,
   Alert,
   FormGroup,
-  Checkbox
+  Checkbox,
+  Card,
+  CardContent,
+  CardActions,
+  Chip,
+  LinearProgress,
+  Avatar,
+  Badge,
+  Tooltip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Slider,
+  InputAdornment,
+  OutlinedInput
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -45,7 +59,31 @@ import {
   Email as EmailIcon,
   Lock as LockIcon,
   Palette as PaletteIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Person as PersonIcon,
+  CloudUpload as CloudUploadIcon,
+  CloudDownload as CloudDownloadIcon,
+  Key as KeyIcon,
+  Link as LinkIcon,
+  Storage as StorageIcon,
+  Speed as SpeedIcon,
+  PrivacyTip as PrivacyTipIcon,
+  History as HistoryIcon,
+  Sync as SyncIcon,
+  Backup as BackupIcon,
+  Restore as RestoreIcon,
+  Code as CodeIcon,
+  Extension as ExtensionIcon,
+  Schedule as ScheduleIcon,
+  NotificationsActive as NotificationsActiveIcon,
+  SecurityUpdateGood as SecurityUpdateGoodIcon,
+  TextFields as TypographyIcon,
+  AccountTree as AccountTreeIcon,
+  DataUsage as DataUsageIcon,
+  FilterList as FilterListIcon,
+  Tune as TuneIcon,
+  DeveloperMode as DeveloperModeIcon,
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 
 // Tab panel component
@@ -90,6 +128,10 @@ const Settings = () => {
     marketing: false,
     reminders: true,
     mentions: true,
+    desktop: true,
+    mobile: true,
+    weeklyDigest: true,
+    criticalAlerts: true,
   });
   
   // Theme settings
@@ -98,6 +140,10 @@ const Settings = () => {
     primaryColor: theme.palette.primary.main,
     fontSize: 'medium',
     dense: false,
+    customCSS: '',
+    animations: true,
+    reducedMotion: false,
+    highContrast: false,
   });
   
   // Security settings
@@ -106,6 +152,11 @@ const Settings = () => {
     loginAlerts: true,
     showRecentActivity: true,
     autoLogout: 30, // minutes
+    sessionTimeout: 60,
+    passwordStrength: 'medium',
+    biometricAuth: false,
+    ipWhitelist: [],
+    auditLog: true,
   });
   
   // Account settings
@@ -114,7 +165,40 @@ const Settings = () => {
     timezone: 'UTC',
     dateFormat: 'MM/DD/YYYY',
     timeFormat: '12h',
+    currency: 'USD',
+    numberFormat: '1,234.56',
+    defaultView: 'dashboard',
   });
+
+  // Advanced settings
+  const [advancedSettings, setAdvancedSettings] = useState({
+    apiKeys: [],
+    webhooks: [],
+    integrations: [],
+    backupSettings: {
+      autoBackup: true,
+      backupFrequency: 'daily',
+      retentionDays: 30,
+      cloudStorage: true,
+    },
+    performanceSettings: {
+      cacheSize: 100,
+      compression: true,
+      lazyLoading: true,
+      prefetchData: false,
+    },
+    developerSettings: {
+      debugMode: false,
+      showLogs: false,
+      apiEndpoints: true,
+      experimentalFeatures: false,
+    }
+  });
+
+  const [activeSessions, setActiveSessions] = useState([
+    { id: 1, device: 'Chrome on Windows', location: 'New York, USA', lastActive: '2 minutes ago', current: true },
+    { id: 2, device: 'Mobile App on iPhone', location: 'London, UK', lastActive: '1 hour ago', current: false },
+  ]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -211,13 +295,6 @@ const Settings = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Active sessions data
-  const [activeSessions, setActiveSessions] = useState([
-    { id: 1, device: 'Windows 10, Chrome', location: 'San Francisco, CA', lastActive: '2 hours ago', current: true },
-    { id: 2, device: 'iPhone 13, Safari', location: 'New York, NY', lastActive: '1 day ago', current: false },
-    { id: 3, device: 'MacBook Pro, Safari', location: 'London, UK', lastActive: '1 week ago', current: false },
-  ]);
-
   const terminateSession = (id) => {
     setActiveSessions(activeSessions.filter(session => session.id !== id));
     setSnackbar({
@@ -257,6 +334,8 @@ const Settings = () => {
           <Tab label="Security" icon={<SecurityIcon />} iconPosition="start" {...a11yProps(2)} />
           <Tab label="Appearance" icon={<PaletteIcon />} iconPosition="start" {...a11yProps(3)} />
           <Tab label="Account" icon={<PersonIcon />} iconPosition="start" {...a11yProps(4)} />
+          <Tab label="Advanced" icon={<DeveloperModeIcon />} iconPosition="start" {...a11yProps(5)} />
+          <Tab label="Integrations" icon={<ExtensionIcon />} iconPosition="start" {...a11yProps(6)} />
         </Tabs>
 
         <TabPanel value={tabValue} index={0}>
@@ -266,7 +345,7 @@ const Settings = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Display Name"
@@ -275,7 +354,7 @@ const Settings = () => {
                   margin="normal"
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Email"
@@ -285,7 +364,7 @@ const Settings = () => {
                   type="email"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <TextField
                   fullWidth
                   label="Bio"
@@ -305,7 +384,7 @@ const Settings = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="language-label">Language</InputLabel>
                   <Select
@@ -322,7 +401,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="timezone-label">Time Zone</InputLabel>
                   <Select
@@ -338,7 +417,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="date-format-label">Date Format</InputLabel>
                   <Select
@@ -353,7 +432,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="time-format-label">Time Format</InputLabel>
                   <Select
@@ -400,7 +479,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <EmailIcon color="primary" sx={{ mr: 1 }} />
@@ -476,7 +555,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <InfoIcon color="primary" sx={{ mr: 1 }} />
@@ -544,7 +623,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <LockIcon color="primary" sx={{ mr: 1 }} />
@@ -745,7 +824,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <PaletteIcon color="primary" sx={{ mr: 1 }} />
@@ -906,7 +985,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <TypographyIcon color="primary" sx={{ mr: 1 }} />
@@ -987,7 +1066,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Account Information
@@ -1091,7 +1170,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Danger Zone
@@ -1174,6 +1253,178 @@ const Settings = () => {
               Save Account Settings
             </Button>
           </Box>
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={5}>
+          <Typography variant="h6" gutterBottom fontWeight="bold">
+            Advanced Settings
+          </Typography>
+          <Typography variant="body2" color="textSecondary" paragraph>
+            Advanced configuration options for developers and power users
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+          
+          <Grid container spacing={3}>
+            <Grid xs={12} md={6}>
+              <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <CodeIcon color="primary" sx={{ mr: 1 }} />
+                  <Typography variant="subtitle1" fontWeight="bold">API Keys</Typography>
+                </Box>
+                
+                <Typography variant="body2" color="textSecondary" paragraph>
+                  Manage API keys for external integrations
+                </Typography>
+                
+                <Button variant="outlined" startIcon={<KeyIcon />} sx={{ mb: 2 }}>
+                  Generate New API Key
+                </Button>
+                
+                <List dense>
+                  {advancedSettings.apiKeys.map((key, index) => (
+                    <ListItem key={index}>
+                      <ListItemText 
+                        primary={`API Key ${index + 1}`}
+                        secondary={`Created: ${key.created || 'N/A'}`}
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton size="small" color="error">
+                          <DeleteIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))}
+                </List>
+              </Paper>
+            </Grid>
+            
+            <Grid xs={12} md={6}>
+              <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <BackupIcon color="primary" sx={{ mr: 1 }} />
+                  <Typography variant="subtitle1" fontWeight="bold">Backup Settings</Typography>
+                </Box>
+                
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={advancedSettings.backupSettings.autoBackup}
+                      onChange={(e) => setAdvancedSettings({
+                        ...advancedSettings,
+                        backupSettings: {
+                          ...advancedSettings.backupSettings,
+                          autoBackup: e.target.checked
+                        }
+                      })}
+                    />
+                  }
+                  label="Automatic Backup"
+                />
+                
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                  <InputLabel>Backup Frequency</InputLabel>
+                  <Select
+                    value={advancedSettings.backupSettings.backupFrequency}
+                    label="Backup Frequency"
+                    onChange={(e) => setAdvancedSettings({
+                      ...advancedSettings,
+                      backupSettings: {
+                        ...advancedSettings.backupSettings,
+                        backupFrequency: e.target.value
+                      }
+                    })}
+                  >
+                    <MenuItem value="hourly">Hourly</MenuItem>
+                    <MenuItem value="daily">Daily</MenuItem>
+                    <MenuItem value="weekly">Weekly</MenuItem>
+                    <MenuItem value="monthly">Monthly</MenuItem>
+                  </Select>
+                </FormControl>
+                
+                <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" startIcon={<CloudUploadIcon />}>
+                    Backup Now
+                  </Button>
+                  <Button variant="outlined" startIcon={<CloudDownloadIcon />}>
+                    Restore
+                  </Button>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SaveIcon />}
+              onClick={() => setSnackbar({ open: true, message: 'Advanced settings saved successfully!', severity: 'success' })}
+            >
+              Save Advanced Settings
+            </Button>
+          </Box>
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={6}>
+          <Typography variant="h6" gutterBottom fontWeight="bold">
+            Integrations
+          </Typography>
+          <Typography variant="body2" color="textSecondary" paragraph>
+            Connect with third-party services and applications
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+          
+          <Grid container spacing={3}>
+            <Grid xs={12} md={6}>
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                      <LinkIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6">Slack Integration</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Get notifications in your Slack workspace
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Button variant="outlined" size="small" sx={{ mr: 1 }}>
+                    Connect
+                  </Button>
+                  <Button variant="text" size="small">
+                    Learn More
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            
+            <Grid xs={12} md={6}>
+              <Card sx={{ mb: 2 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Avatar sx={{ bgcolor: 'success.main', mr: 2 }}>
+                      <EmailIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6">Google Workspace</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Sync with Google Calendar and Drive
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Button variant="outlined" size="small" sx={{ mr: 1 }}>
+                    Connect
+                  </Button>
+                  <Button variant="text" size="small">
+                    Learn More
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </TabPanel>
       </Paper>
 

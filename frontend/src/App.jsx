@@ -7,13 +7,22 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 // Import components
 import Sidebar from './components/layout/Sidebar';
 import Topbar from './components/layout/Topbar';
+import AuthGuard from './components/auth/AuthGuard';
+import LogoutButton from './components/auth/LogoutButton';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
-import Team from './pages/team';
+import TeamMembers from './pages/team/TeamMembers'; // Fixed import path
 import Reports from './pages/Reports';
 import Notifications from './pages/Notifications';
 import Help from './pages/Help';
 import Profile from './pages/Profile';
+import Analytics from './pages/Analytics';
+import Calendar from './pages/Calendar';
+import Settings from './pages/Settings';
+
+// Import auth pages
+import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
 
 // Create a context for the color mode
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -145,16 +154,10 @@ const Layout = ({ children }) => {
         component="main" 
         sx={{ 
           flexGrow: 1, 
-          p: 3, 
-          width: { 
-            xs: '100%',
-            md: open ? `calc(100% - 260px)` : `calc(100% - 70px)`
-          },
-          ml: { 
-            xs: 0,
-            md: open ? '260px' : '70px' 
-          },
-          transition: theme.transitions.create(['margin', 'width'], {
+          px: 0, // Remove all horizontal padding
+          py: 1, // Minimal vertical padding
+          minWidth: 0, // Prevents overflow issues
+          transition: theme.transitions.create(['margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
@@ -188,95 +191,115 @@ function App() {
         <CssBaseline />
         <Router>
           <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            
+            {/* Protected routes */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route
               path="/dashboard"
               element={
-                <Layout>
-                  <Dashboard />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
               path="/tasks"
               element={
-                <Layout>
-                  <Tasks />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Tasks />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
-              path="/team/*"
+              path="/analytics"
               element={
-                <Layout>
-                  <Team />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Analytics />
+                  </Layout>
+                </AuthGuard>
               }
-            >
-              <Route path="*" element={<Team />} />
-            </Route>
+            />
+            <Route
+              path="/calendar"
+              element={
+                <AuthGuard>
+                  <Layout>
+                    <Calendar />
+                  </Layout>
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/team"
+              element={
+                <AuthGuard>
+                  <Layout>
+                    <TeamMembers /> {/* Direct import of TeamMembers component */}
+                  </Layout>
+                </AuthGuard>
+              }
+            />
             <Route
               path="/reports"
               element={
-                <Layout>
-                  <Reports />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Reports />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
               path="/notifications"
               element={
-                <Layout>
-                  <Notifications />
-                </Layout>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <Layout>
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Settings</Typography>
-                    {/* Settings content will go here */}
-                  </Box>
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Notifications />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
               path="/help"
               element={
-                <Layout>
-                  <Help />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Help />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
               path="/profile"
               element={
-                <Layout>
-                  <Profile />
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </AuthGuard>
               }
             />
             <Route
-              path="*"
+              path="/settings"
               element={
-                <Layout>
-                  <Box sx={{ textAlign: 'center', pt: 10 }}>
-                    <Typography variant="h3">404 - Page Not Found</Typography>
-                    <Button 
-                      component={Link} 
-                      to="/dashboard" 
-                      variant="contained" 
-                      color="primary" 
-                      sx={{ mt: 3 }}
-                    >
-                      Go to Dashboard
-                    </Button>
-                  </Box>
-                </Layout>
+                <AuthGuard>
+                  <Layout>
+                    <Settings />
+                  </Layout>
+                </AuthGuard>
               }
             />
+            
+            {/* Redirect unknown routes to login */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
       </ThemeProvider>

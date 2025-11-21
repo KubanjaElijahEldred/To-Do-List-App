@@ -39,9 +39,12 @@ import {
   Person as PersonIcon,
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
 import { useAppContext } from '../contexts/AppContext';
+import PageLayout from '../components/layout/PageLayout';
+import PageHeader from '../components/common/PageHeader';
 
 // StatCard component with CRUD operations
 const StatCard = ({ title, value, icon: Icon, color, unit, onEdit, onDelete }) => {
@@ -71,9 +74,10 @@ const StatCard = ({ title, value, icon: Icon, color, unit, onEdit, onDelete }) =
   return (
     <Card sx={{ 
       borderRadius: 2, 
-      p: 3,
+      p: 0,
       height: '100%',
-      minHeight: '200px',
+      minHeight: 200,
+      maxHeight: 400,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -82,12 +86,13 @@ const StatCard = ({ title, value, icon: Icon, color, unit, onEdit, onDelete }) =
       position: 'relative',
       overflow: 'hidden',
       transition: 'all 0.3s ease-in-out',
+      flex: 1,
       '&:hover': {
         transform: 'translateY(-4px)',
         boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
       }
     }}>
-      <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', height: '100%', p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
           <Box sx={{ flex: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
@@ -284,216 +289,198 @@ const Dashboard = () => {
   };
 
   return (
-    <Box sx={{ 
-      p: { xs: 2, sm: 3 },
-      pt: { xs: 8, sm: 9 },
-      maxWidth: '100%',
-      overflowX: 'hidden',
-      backgroundColor: '#f8f9fa',
-      minHeight: '100vh',
-      fontFamily: '"Poppins", sans-serif',
-      boxSizing: 'border-box'
-    }}>
-      {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 4
-      }}>
-        <Box>
+    <PageLayout>
+      <Box sx={{ flexGrow: 1, p: 3 }}>
+        <PageHeader 
+          title="Dashboard Overview" 
+          subtitle="Track your fitness progress and activities"
+          actions={
+            <>
+              <Button 
+                variant="outlined" 
+                color="primary" 
+                startIcon={<RefreshIcon />}
+                onClick={handleRefresh}
+                sx={{ mr: 1 }}
+              >
+                Refresh
+              </Button>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                startIcon={<AddIcon />}
+                onClick={() => setIsAddDialogOpen(true)}
+              >
+                Add Task
+              </Button>
+            </>
+          }
+        />
+        {/* Header */}
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          mb: 4
+        }}>
+          <Box>
+            <Typography variant="h4" fontWeight="bold" sx={{ 
+              fontSize: { xs: '1.5rem', sm: '2rem' },
+              background: 'linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block',
+              fontFamily: '"Poppins", sans-serif'
+            }}>
+              FitTrack
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              Welcome back, Alex!
+            </Typography>
+          </Box>
+          <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+            <PersonIcon />
+          </Avatar>
+        </Box>
+
+        {/* Header with Add Button */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" fontWeight="bold" sx={{ 
             fontSize: { xs: '1.5rem', sm: '2rem' },
             background: 'linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             display: 'inline-block',
-            fontFamily: '"Poppins", sans-serif'
           }}>
-            FitTrack
+            Dashboard
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Welcome back, Alex!
-          </Typography>
+          <Button 
+            variant="contained" 
+            startIcon={<AddIcon />}
+            onClick={() => setIsAddDialogOpen(true)}
+            sx={{ 
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+                transform: 'translateY(-2px)'
+              },
+              transition: 'all 0.3s ease-in-out',
+              boxShadow: 2
+            }}
+          >
+            Add Task
+          </Button>
         </Box>
-        <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
-          <PersonIcon />
-        </Avatar>
-      </Box>
 
-      {/* Header with Add Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" fontWeight="bold" sx={{ 
-          fontSize: { xs: '1.5rem', sm: '2rem' },
-          background: 'linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          display: 'inline-block',
+        {/* Stats Grid */}
+        <Grid container spacing={0} sx={{ mb: 4 }}>
+          <Grid xs={12} sm={6} lg={3} xl={3}>
+            <StatCard 
+              title="Total Tasks" 
+              value={tasks.length.toString()} 
+              icon={FireIcon} 
+              color="#FF6B6B" 
+              unit="tasks"
+              onEdit={(newValue) => handleUpdateStat('tasks', newValue)}
+              onDelete={() => {}}
+            />
+          </Grid>
+          <Grid xs={12} sm={6} lg={3} xl={3}>
+            <StatCard 
+              title="Steps" 
+              value="12,548" 
+              icon={RunIcon} 
+              color="#4ECDC4" 
+              unit="steps"
+            />
+          </Grid>
+          <Grid xs={12} sm={6} lg={3} xl={3}>
+            <StatCard 
+              title="Heart Rate" 
+              value="128" 
+              icon={HeartIcon} 
+              color="#FF9E80" 
+              unit="bpm"
+            />
+          </Grid>
+          <Grid xs={12} sm={6} lg={3} xl={3}>
+            <StatCard 
+              title="Water Intake" 
+              value="2.5" 
+              icon={WaterIcon} 
+              color="#6C63FF" 
+              unit="L"
+            />
+          </Grid>
+        </Grid>
+
+        {/* Workout Plan */}
+        <Card sx={{ 
+          mb: 3, 
+          borderRadius: 3,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+          background: 'white',
+          overflow: 'hidden'
         }}>
-          Dashboard
-        </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          onClick={() => setIsAddDialogOpen(true)}
-          sx={{ 
-            bgcolor: 'primary.main',
-            '&:hover': {
-              bgcolor: 'primary.dark',
-              transform: 'translateY(-2px)'
-            },
-            transition: 'all 0.3s ease-in-out',
-            boxShadow: 2
-          }}
-        >
-          Add Task
-        </Button>
-      </Box>
-
-      {/* Stats Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Total Tasks" 
-            value={tasks.length.toString()} 
-            icon={FireIcon} 
-            color="#FF6B6B" 
-            unit="tasks"
-            onEdit={(newValue) => handleUpdateStat('tasks', newValue)}
-            onDelete={() => {}}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Steps" 
-            value="12,548" 
-            icon={RunIcon} 
-            color="#4ECDC4" 
-            unit="steps"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Heart Rate" 
-            value="128" 
-            icon={HeartIcon} 
-            color="#FF9E80" 
-            unit="bpm"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard 
-            title="Water Intake" 
-            value="2.5" 
-            icon={WaterIcon} 
-            color="#6C63FF" 
-            unit="L"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <StatCard 
-            title="Calories" 
-            value="2,450" 
-            icon={FireIcon} 
-            color="#FF6B6B" 
-            unit="kcal"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <StatCard 
-            title="Steps" 
-            value="12,548" 
-            icon={RunIcon} 
-            color="#4ECDC4" 
-            unit="steps"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <StatCard 
-            title="Heart Rate" 
-            value="128" 
-            icon={HeartIcon} 
-            color="#FF9E80" 
-            unit="bpm"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <StatCard 
-            title="Water" 
-            value="2.5" 
-            icon={WaterIcon} 
-            color="#6C63FF" 
-            unit="L"
-          />
-        </Grid>
-      </Grid>
-
-      {/* Workout Plan */}
-      <Card sx={{ 
-        mb: 3, 
-        borderRadius: 3,
-        boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
-        background: 'white',
-        overflow: 'hidden'
-      }}>
-        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h6" fontWeight="bold">Today's Workout</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Full Body Workout</Typography>
-            </Box>
-            <Box sx={{ 
-              bgcolor: 'rgba(255,255,255,0.2)', 
-              px: 1.5, 
-              py: 0.5, 
-              borderRadius: 4,
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-              <Typography variant="caption">45 min</Typography>
+          <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box>
+                <Typography variant="h6" fontWeight="bold">Today's Workout</Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>Full Body Workout</Typography>
+              </Box>
+              <Box sx={{ 
+                bgcolor: 'rgba(255,255,255,0.2)', 
+                px: 1.5, 
+                py: 0.5, 
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center'
+              }}>
+                <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                <Typography variant="caption">45 min</Typography>
+              </Box>
             </Box>
           </Box>
-        </Box>
-        
-        <Box sx={{ p: 2 }}>
-          {workoutPlan.exercises.map((exercise, index) => (
-            <Box key={index} sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              py: 1.5,
-              borderBottom: index !== workoutPlan.exercises.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none'
-            }}>
-              <Typography>{exercise.name}</Typography>
-              <Typography variant="body2" color="text.secondary">{exercise.time}</Typography>
-            </Box>
-          ))}
           
-          {loading ? (
-            <Box display="flex" justifyContent="center" p={4}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Recent Activities
-              </Typography>
-              {activities.map((activity) => (
-                <ActivityItem
-                  key={activity.id}
-                  title={activity.title}
-                  time={activity.time}
-                  value={activity.value}
-                  icon={activity.icon}
-                  color={activity.color}
-                />
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Card>
-    </Box>
+          <Box sx={{ p: 2 }}>
+            {workoutPlan.exercises.map((exercise, index) => (
+              <Box key={index} sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                py: 1.5,
+                borderBottom: index !== workoutPlan.exercises.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none'
+              }}>
+                <Typography>{exercise.name}</Typography>
+                <Typography variant="body2" color="text.secondary">{exercise.time}</Typography>
+              </Box>
+            ))}
+            
+            {loading ? (
+              <Box display="flex" justifyContent="center" p={4}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  Recent Activities
+                </Typography>
+                {activities.map((activity) => (
+                  <ActivityItem
+                    key={activity.id}
+                    title={activity.title}
+                    time={activity.time}
+                    value={activity.value}
+                    icon={activity.icon}
+                    color={activity.color}
+                  />
+                ))}
+              </Box>
+            )}
+          </Box>
+        </Card>
+      </Box>
+    </PageLayout>
   );
 };
 

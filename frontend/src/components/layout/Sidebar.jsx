@@ -31,6 +31,8 @@ import {
   ExpandLess,
   ExpandMore,
   StarBorder,
+  CalendarToday as CalendarIcon,
+  BarChart as AnalyticsIcon,
 } from '@mui/icons-material';
 import { styled, useTheme as useMuiTheme } from '@mui/material/styles';
 
@@ -40,24 +42,14 @@ const collapsedWidth = 70;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Tasks', icon: <ListIcon />, path: '/tasks' },
-  { 
-    text: 'Team', 
-    icon: <GroupIcon />, 
-    path: '/team',
-    subItems: [
-      { text: 'Members', path: '/team/members' },
-      { text: 'Roles', path: '/team/roles' },
-    ]
-  },
-  { text: 'Reports', icon: <ReportIcon />, path: '/reports' },
+  { text: 'Calendar', icon: <CalendarIcon />, path: '/calendar' },
+  { text: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
+  { text: 'Team', icon: <GroupIcon />, path: '/team' },
+  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   { text: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
 ];
 
-const settingsItems = [
-  { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-  { text: 'Help', icon: <HelpIcon />, path: '/help' },
-];
+const settingsItems = [];
 
 const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
