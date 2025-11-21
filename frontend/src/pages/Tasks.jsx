@@ -367,7 +367,8 @@ const Tasks = () => {
           </Box>
         </Box>
 
-        <List sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 1, overflow: 'hidden' }}>
+        {viewMode === 'list' ? (
+          <List sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 1, overflow: 'hidden' }}>
           {loading ? (
             <Box display="flex" justifyContent="center" p={4}>
               <CircularProgress />
@@ -396,43 +397,45 @@ const Tasks = () => {
                     </IconButton>
                   }
                   sx={{
-                    '&:hover': { bgcolor: 'action.hover' },
-                    textDecoration: task.completed ? 'line-through' : 'none',
-                    opacity: task.completed ? 0.7 : 1
+                    '&:hover': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    },
                   }}
                 >
                   <ListItemIcon>
                     <Checkbox
+                      edge="start"
                       checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                      icon={<RadioButtonUncheckedIcon />}
-                      checkedIcon={<CheckCircleIcon color="primary" />}
+                      tabIndex={-1}
+                      disableRipple
                     />
                   </ListItemIcon>
                   <ListItemText
                     primary={
                       <Typography
-                        variant="body1"
+                        variant="subtitle1"
                         sx={{
                           textDecoration: task.completed ? 'line-through' : 'none',
-                          color: task.completed ? 'text.secondary' : 'text.primary',
+                          fontWeight: task.completed ? 'normal' : 'bold',
                         }}
                       >
                         {task.title}
                       </Typography>
                     }
                     secondary={
-                      <Box component="span" sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                        {task.dueDate && (
+                      <Box component="span">
+                        <Typography variant="body2" color="textSecondary">
+                          {task.description}
+                        </Typography>
+                        <Box sx={{ mt: 1 }}>
                           <Chip
-                            icon={<TodayIcon fontSize="small" />}
-                            label={new Date(task.dueDate).toLocaleDateString()}
+                            icon={<TodayIcon />}
+                            label={task.dueDate}
                             size="small"
                             variant="outlined"
-                            sx={{ mr: 1 }}
+                            color={getPriorityColor(task.priority)}
                           />
-                        )}
-                        <PriorityChip priority={task.priority} />
+                        </Box>
                       </Box>
                     }
                   />
@@ -445,7 +448,7 @@ const Tasks = () => {
       ) : (
         <Grid container spacing={2}>
           {searchedTasks.map((task) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
+            <Grid xs={12} sm={6} md={4} lg={3} key={task.id}>
               <StyledPaper>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                   <Box>
