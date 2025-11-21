@@ -50,53 +50,120 @@ const PriorityChip = ({ priority }) => {
 };
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([
-    { id: 1, text: 'Complete project proposal', completed: false, priority: 'high', dueDate: '2023-12-15' },
-    { id: 2, text: 'Review code changes', completed: true, priority: 'medium', dueDate: '2023-12-10' },
-    { id: 3, text: 'Team meeting', completed: false, priority: 'high', dueDate: '2023-12-12' },
-    { id: 4, text: 'Update documentation', completed: false, priority: 'low', dueDate: '2023-12-20' },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [newTask, setNewTask] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  const handleAddTask = (e) => {
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true);
+      try {
+        // TODO: Replace with actual API call
+        // const response = await fetch('/api/tasks');
+        // const data = await response.json();
+        // setTasks(data);
+        
+        // For now, set empty array
+        setTasks([]);
+      } catch (err) {
+        setError('Failed to load tasks');
+        console.error('Error fetching tasks:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleAddTask = async (e) => {
     e.preventDefault();
     if (newTask.trim() === '') return;
     
-    const newTaskObj = {
-      id: Date.now(),
-      text: newTask,
-      completed: false,
-      priority: 'medium',
-      dueDate: new Date().toISOString().split('T')[0],
-    };
-    
-    setTasks([...tasks, newTaskObj]);
-    setNewTask('');
+    try {
+      // TODO: Replace with actual API call
+      // const response = await fetch('/api/tasks', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     text: newTask,
+      //     completed: false,
+      //     priority: 'medium',
+      //     dueDate: new Date().toISOString().split('T')[0],
+      //   })
+      // });
+      // const newTaskData = await response.json();
+      // setTasks([...tasks, newTaskData]);
+      
+      // For now, just clear the input
+      setNewTask('');
+    } catch (err) {
+      console.error('Error adding task:', err);
+    }
   };
 
-  const toggleTask = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+  const toggleTask = async (taskId) => {
+    try {
+      // TODO: Replace with actual API call
+      // const taskToUpdate = tasks.find(t => t.id === taskId);
+      // const response = await fetch(`/api/tasks/${taskId}`, {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ completed: !taskToUpdate.completed })
+      // });
+      // const updatedTask = await response.json();
+      // setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
+      
+      // For now, just update local state
+      setTasks(tasks.map(task => 
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      ));
+    } catch (err) {
+      console.error('Error updating task:', err);
+    }
   };
 
-  const deleteTask = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
-    setAnchorEl(null);
+  const deleteTask = async (taskId) => {
+    try {
+      // TODO: Replace with actual API call
+      // await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+      // setTasks(tasks.filter(task => task.id !== taskId));
+      
+      // For now, just update local state
+      setTasks(tasks.filter(task => task.id !== taskId));
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    } finally {
+      setAnchorEl(null);
+    }
   };
 
-  const toggleImportant = (taskId) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId 
-        ? { 
-            ...task, 
-            priority: task.priority === 'high' ? 'medium' : 'high' 
-          } 
-        : task
-    ));
+  const toggleImportant = async (taskId) => {
+    try {
+      // TODO: Replace with actual API call
+      // const taskToUpdate = tasks.find(t => t.id === taskId);
+      // const newPriority = taskToUpdate.priority === 'high' ? 'medium' : 'high';
+      // const response = await fetch(`/api/tasks/${taskId}`, {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ priority: newPriority })
+      // });
+      // const updatedTask = await response.json();
+      // setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
+      
+      // For now, just update local state
+      setTasks(tasks.map(task => 
+        task.id === taskId 
+          ? { ...task, priority: task.priority === 'high' ? 'medium' : 'high' } 
+          : task
+      ));
+    } catch (err) {
+      console.error('Error updating task priority:', err);
+    }
   };
 
   const handleMenuClick = (event, task) => {
@@ -184,7 +251,15 @@ const Tasks = () => {
         </Box>
 
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-          {filteredTasks.length > 0 ? (
+          {loading ? (
+            <Box display="flex" justifyContent="center" p={4}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Box sx={{ p: 2, color: 'error.main' }}>
+              <Typography>{error}</Typography>
+            </Box>
+          ) : filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <React.Fragment key={task.id}>
                 <ListItem 
@@ -226,22 +301,11 @@ const Tasks = () => {
                         >
                           {task.text}
                         </Typography>
-                        <PriorityChip priority={task.priority} />
-                      </Box>
-                    }
-                    secondary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                        <TodayIcon fontSize="small" color="action" sx={{ fontSize: 16, mr: 0.5 }} />
-                        <Typography variant="caption" color="textSecondary">
-                          Due {task.dueDate}
-                        </Typography>
-                      </Box>
-                    }
-                  />
                   <IconButton 
-                    onClick={() => toggleImportant(task.id)}
-                    sx={{ ml: 1 }}
+                    edge="end" 
+                    onClick={(e) => handleMenuClick(e, task)}
                   >
+                    <MoreVertIcon />
                     {task.priority === 'high' ? (
                       <StarIcon color="warning" />
                     ) : (
