@@ -24,6 +24,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { ColorModeContext } from '../../App';
+import LogoutButton from '../auth/LogoutButton';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: 'white',
@@ -129,37 +130,8 @@ const Topbar = () => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              ml: 1,
-              p: 1,
-              borderRadius: 2,
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-                cursor: 'pointer',
-              },
-            }}
-          >
-            <Avatar
-              alt="User Avatar"
-              src="https://randomuser.me/api/portraits/men/1.jpg"
-              sx={{ 
-                width: 36, 
-                height: 36, 
-                mr: 1.5,
-                border: `2px solid ${theme.palette.primary.main}`,
-              }}
-            />
-            <Box sx={{ textAlign: 'left' }}>
-              <Typography variant="subtitle2" sx={{ lineHeight: 1, fontWeight: 600 }}>
-                John Doe
-              </Typography>
-              <Typography variant="caption" color="textSecondary">
-                Admin
-              </Typography>
-            </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <LogoutButton />
           </Box>
         </Box>
       </Toolbar>

@@ -12,10 +12,19 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url))
-      }
+      },
+      extensions: ['.js', '.jsx', '.json']
     },
     server: {
-      historyApiFallback: true,
+      port: 5173,
+      strictPort: true,
+      open: true,
+      historyApiFallback: {
+        disableDotRule: true,
+        rewrites: [
+          { from: /^\/src\/pages\//, to: '/' },
+        ]
+      },
       proxy: {
         // Add your API proxy settings here if needed
       }

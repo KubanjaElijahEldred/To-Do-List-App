@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -9,7 +9,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Paper,
   Tabs,
@@ -19,24 +18,36 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
+  Grid,
+  InputAdornment,
+  Tooltip,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   Add as AddIcon,
-  Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   Today as TodayIcon,
   StarBorder as StarBorderIcon,
   Star as StarIcon,
+  Search as SearchIcon,
+  ViewList as ViewListIcon,
+  ViewModule as ViewModuleIcon,
+  Refresh as RefreshIcon,
+  CheckCircle as CheckCircleIcon,
+  RadioButtonUnchecked as RadioButtonUncheckedIcon,
   FilterList as FilterListIcon,
-  Sort as SortIcon,
+  Sort as SortIcon
 } from '@mui/icons-material';
+import PageLayout from '../components/layout/PageLayout';
+import PageHeader from '../components/common/PageHeader';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
-  marginBottom: theme.spacing(3),
   borderRadius: 12,
   boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
 const PriorityChip = ({ priority }) => {
@@ -51,273 +62,377 @@ const PriorityChip = ({ priority }) => {
 };
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [newTask, setNewTask] = useState('');
-  const [tabValue, setTabValue] = useState(0);
+  // State for UI
+  const [viewMode, setViewMode] = useState('list');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  
+  // Task state
+  const [tasks, setTasks] = useState([
+    { 
+      id: 1, 
+      title: 'Complete project proposal', 
+      completed: false, 
+      important: true, 
+      priority: 'high',
+      dueDate: '2023-11-25'
+    },
+    { 
+      id: 2, 
+      title: 'Review pull requests', 
+      completed: true, 
+      important: false, 
+      priority: 'medium',
+      dueDate: '2023-11-20'
+    },
+    { 
+      id: 3, 
+      title: 'Update documentation', 
+      completed: false, 
+      important: true, 
+      priority: 'low',
+      dueDate: '2023-11-30'
+    },
+  ]);
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [newTask, setNewTask] = useState('');
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      setLoading(true);
-      try {
-        // TODO: Replace with actual API call
-        // const response = await fetch('/api/tasks');
-        // const data = await response.json();
-        // setTasks(data);
-        
-        // For now, set empty array
-        setTasks([]);
-      } catch (err) {
-        setError('Failed to load tasks');
-        console.error('Error fetching tasks:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Filter tasks based on active tab
+  const filteredTasks = tasks.filter(task => {
+    if (activeTab === 'active') return !task.completed;
+    if (activeTab === 'completed') return task.completed;
+    if (activeTab === 'important') return task.important;
+    return true; // 'all' tab
+  });
+  
+  // Filter by search query
+  const searchedTasks = filteredTasks.filter(task =>
+    task.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-    fetchTasks();
-  }, []);
-
-  const handleAddTask = async (e) => {
+  // Handle adding a new task
+  const handleAddTask = (e) => {
     e.preventDefault();
-    if (newTask.trim() === '') return;
+    if (!newTask.trim()) return;
     
-    try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/tasks', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     text: newTask,
-      //     completed: false,
-      //     priority: 'medium',
-      //     dueDate: new Date().toISOString().split('T')[0],
-      //   })
-      // });
-      // const newTaskData = await response.json();
-      // setTasks([...tasks, newTaskData]);
-      
-      // For now, just clear the input
-      setNewTask('');
-    } catch (err) {
-      console.error('Error adding task:', err);
-    }
+    const newTaskItem = {
+      id: Date.now(),
+      title: newTask.trim(),
+      completed: false,
+      important: false,
+      priority: 'medium',
+      dueDate: null,
+      createdAt: new Date().toISOString()
+    };
+    
+    setTasks([newTaskItem, ...tasks]);
+    setNewTask('');
   };
 
-  const toggleTask = async (taskId) => {
-    try {
-      // TODO: Replace with actual API call
-      // const taskToUpdate = tasks.find(t => t.id === taskId);
-      // const response = await fetch(`/api/tasks/${taskId}`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ completed: !taskToUpdate.completed })
-      // });
-      // const updatedTask = await response.json();
-      // setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
-      
-      // For now, just update local state
-      setTasks(tasks.map(task => 
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      ));
-    } catch (err) {
-      console.error('Error updating task:', err);
-    }
+  // Toggle task completion
+  const toggleTask = (taskId) => {
+    setTasks(tasks.map(task =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    ));
   };
-
-  const deleteTask = async (taskId) => {
-    try {
-      // TODO: Replace with actual API call
-      // await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
-      // setTasks(tasks.filter(task => task.id !== taskId));
-      
-      // For now, just update local state
-      setTasks(tasks.filter(task => task.id !== taskId));
-    } catch (err) {
-      console.error('Error deleting task:', err);
-    } finally {
-      setAnchorEl(null);
-    }
+  
+  // Toggle task importance and priority
+  const toggleImportant = (taskId) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        return { 
+          ...task, 
+          important: !task.important,
+          priority: task.priority === 'high' ? 'medium' : 'high'
+        };
+      }
+      return task;
+    }));
   };
-
-  const toggleImportant = async (taskId) => {
-    try {
-      // TODO: Replace with actual API call
-      // const taskToUpdate = tasks.find(t => t.id === taskId);
-      // const newPriority = taskToUpdate.priority === 'high' ? 'medium' : 'high';
-      // const response = await fetch(`/api/tasks/${taskId}`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ priority: newPriority })
-      // });
-      // const updatedTask = await response.json();
-      // setTasks(tasks.map(task => task.id === taskId ? updatedTask : task));
-      
-      // For now, just update local state
-      setTasks(tasks.map(task => 
-        task.id === taskId 
-          ? { ...task, priority: task.priority === 'high' ? 'medium' : 'high' } 
-          : task
-      ));
-    } catch (err) {
-      console.error('Error updating task priority:', err);
-    }
-  };
-
+  
+  // Handle menu actions
   const handleMenuClick = (event, task) => {
     setAnchorEl(event.currentTarget);
     setSelectedTask(task);
   };
-
+  
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedTask(null);
   };
+  
+  // Handle refresh
+  const handleRefresh = () => {
+    setLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
 
-  const filteredTasks = tasks.filter(task => {
-    if (tabValue === 1) return !task.completed;
-    if (tabValue === 2) return task.completed;
-    return true;
-  });
+  // Delete task
+  const deleteTask = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    handleMenuClose();
+  };
+  
+  // Count tasks by status
+  const taskCounts = {
+    all: tasks.length,
+    active: tasks.filter(t => !t.completed).length,
+    completed: tasks.filter(t => t.completed).length,
+    important: tasks.filter(t => t.important).length
+  };
 
   return (
-    <Box sx={{ p: 3, mt: 8 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          My Tasks
-        </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          startIcon={<AddIcon />}
-          onClick={() => document.getElementById('taskInput')?.focus()}
-        >
-          Add Task
-        </Button>
-      </Box>
+    <PageLayout>
+      <PageHeader 
+        title="My Tasks" 
+        subtitle={taskCounts.active > 0 ? `${taskCounts.active} tasks remaining` : 'All caught up!'}
+        actions={
+          <>
+            <Tooltip title="Refresh">
+              <IconButton onClick={handleRefresh} sx={{ mr: 1 }}>
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={viewMode === 'list' ? 'Grid View' : 'List View'}>
+              <IconButton 
+                onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+                sx={{ mr: 1 }}
+              >
+                {viewMode === 'list' ? <ViewModuleIcon /> : <ViewListIcon />}
+              </IconButton>
+            </Tooltip>
+            <Button 
+              variant="contained" 
+              startIcon={<AddIcon />}
+              onClick={() => document.getElementById('new-task-input')?.focus()}
+            >
+              Add Task
+            </Button>
+          </>
+        }
+      />
 
-      <StyledPaper>
-        <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+      {/* Search and filter */}
+      <Box sx={{ mb: 3 }}>
+        <form onSubmit={handleAddTask}>
           <TextField
-            id="taskInput"
+            id="new-task-input"
             fullWidth
             variant="outlined"
             placeholder="Add a new task..."
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             InputProps={{
-              startAdornment: <AddIcon sx={{ color: 'action.active', mr: 1 }} />,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AddIcon color="action" />
+                </InputAdornment>
+              ),
             }}
           />
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary"
-            sx={{ whiteSpace: 'nowrap' }}
-          >
-            Add Task
-          </Button>
         </form>
+      </Box>
+      
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search tasks..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
           <Tabs 
-            value={tabValue} 
-            onChange={(e, newValue) => setTabValue(newValue)}
-            aria-label="task tabs"
+            value={activeTab} 
+            onChange={(e, newValue) => setActiveTab(newValue)}
+            aria-label="task filters"
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': {
+                minWidth: 100,
+                textTransform: 'none',
+                fontWeight: 500,
+              },
+              '& .Mui-selected': {
+                color: 'primary.main',
+                fontWeight: 600,
+              },
+            }}
           >
-            <Tab label="All Tasks" />
-            <Tab label="Active" />
-            <Tab label="Completed" />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <span>All</span>
+                  {taskCounts.all > 0 && (
+                    <Chip 
+                      label={taskCounts.all} 
+                      size="small" 
+                      sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+                    />
+                  )}
+                </Box>
+              } 
+              value="all" 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <span>Active</span>
+                  {taskCounts.active > 0 && (
+                    <Chip 
+                      label={taskCounts.active} 
+                      size="small" 
+                      color="primary"
+                      sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+                    />
+                  )}
+                </Box>
+              } 
+              value="active" 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <span>Completed</span>
+                  {taskCounts.completed > 0 && (
+                    <Chip 
+                      label={taskCounts.completed} 
+                      size="small" 
+                      color="success"
+                      sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+                    />
+                  )}
+                </Box>
+              } 
+              value="completed" 
+            />
+            <Tab 
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <StarIcon fontSize="small" sx={{ mr: 0.5, color: 'warning.main' }} />
+                  <span>Important</span>
+                  {taskCounts.important > 0 && (
+                    <Chip 
+                      label={taskCounts.important} 
+                      size="small" 
+                      color="warning"
+                      sx={{ ml: 1, height: 20, fontSize: '0.7rem' }} 
+                    />
+                  )}
+                </Box>
+              } 
+              value="important" 
+            />
           </Tabs>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
-          <Button 
-            size="small" 
-            startIcon={<FilterListIcon />}
-            sx={{ textTransform: 'none' }}
-          >
-            Filter
-          </Button>
-          <Button 
-            size="small" 
-            startIcon={<SortIcon />}
-            sx={{ textTransform: 'none' }}
-          >
-            Sort
-          </Button>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            {searchedTasks.length} {searchedTasks.length === 1 ? 'task' : 'tasks'} found
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button 
+              size="small" 
+              startIcon={<FilterListIcon />}
+              sx={{ textTransform: 'none' }}
+              disabled={loading}
+            >
+              Filter
+            </Button>
+            <Button 
+              size="small" 
+              startIcon={<SortIcon />}
+              sx={{ textTransform: 'none' }}
+              disabled={loading}
+            >
+              Sort
+            </Button>
+          </Box>
         </Box>
 
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+        <List sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 1, overflow: 'hidden' }}>
           {loading ? (
             <Box display="flex" justifyContent="center" p={4}>
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Box sx={{ p: 2, color: 'error.main' }}>
+            <Box sx={{ p: 2, color: 'error.main', textAlign: 'center' }}>
               <Typography>{error}</Typography>
             </Box>
-          ) : filteredTasks.length > 0 ? (
-            filteredTasks.map((task) => (
+          ) : searchedTasks.length === 0 ? (
+            <Box textAlign="center" p={4}>
+              <Typography variant="subtitle1" color="textSecondary">
+                No tasks found. {activeTab !== 'all' && 'Try changing the filter.'}
+              </Typography>
+            </Box>
+          ) : (
+            searchedTasks.map((task) => (
               <React.Fragment key={task.id}>
-                <ListItem 
-                  sx={{ 
-                    borderRadius: 2,
-                    mb: 1,
-                    backgroundColor: task.completed ? 'action.hover' : 'background.paper',
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
+                <ListItem
                   secondaryAction={
-                    <IconButton 
-                      edge="end" 
+                    <IconButton
+                      edge="end"
+                      aria-label="more"
                       onClick={(e) => handleMenuClick(e, task)}
                     >
                       <MoreVertIcon />
                     </IconButton>
                   }
+                  sx={{
+                    '&:hover': { bgcolor: 'action.hover' },
+                    textDecoration: task.completed ? 'line-through' : 'none',
+                    opacity: task.completed ? 0.7 : 1
+                  }}
                 >
                   <ListItemIcon>
                     <Checkbox
-                      edge="start"
                       checked={task.completed}
-                      tabIndex={-1}
-                      disableRipple
                       onChange={() => toggleTask(task.id)}
+                      icon={<RadioButtonUncheckedIcon />}
+                      checkedIcon={<CheckCircleIcon color="primary" />}
                     />
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography 
-                          variant="body1"
-                          sx={{ 
-                            textDecoration: task.completed ? 'line-through' : 'none',
-                            color: task.completed ? 'text.secondary' : 'text.primary',
-                          }}
-                        >
-                          {task.text}
-                        </Typography>
-                        <Box>
-                          <IconButton 
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          textDecoration: task.completed ? 'line-through' : 'none',
+                          color: task.completed ? 'text.secondary' : 'text.primary',
+                        }}
+                      >
+                        {task.title}
+                      </Typography>
+                    }
+                    secondary={
+                      <Box component="span" sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                        {task.dueDate && (
+                          <Chip
+                            icon={<TodayIcon fontSize="small" />}
+                            label={new Date(task.dueDate).toLocaleDateString()}
                             size="small"
-                            onClick={() => toggleImportant(task.id)}
-                            color={task.priority === 'high' ? 'warning' : 'default'}
-                          >
-                            {task.priority === 'high' ? <StarIcon /> : <StarBorderIcon />}
-                          </IconButton>
-                          <IconButton 
-                            edge="end" 
-                            onClick={(e) => handleMenuClick(e, task)}
-                            size="small"
-                          >
-                            <MoreVertIcon />
-                          </IconButton>
-                        </Box>
+                            variant="outlined"
+                            sx={{ mr: 1 }}
+                          />
+                        )}
+                        <PriorityChip priority={task.priority} />
                       </Box>
                     }
                   />
@@ -325,20 +440,67 @@ const Tasks = () => {
                 <Divider component="li" />
               </React.Fragment>
             ))
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <Typography color="textSecondary">
-                {tabValue === 0 
-                  ? 'No tasks yet. Add one above!' 
-                  : tabValue === 1 
-                    ? 'No active tasks' 
-                    : 'No completed tasks'}
-              </Typography>
-            </Box>
           )}
         </List>
-      </StyledPaper>
+      ) : (
+        <Grid container spacing={2}>
+          {searchedTasks.map((task) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
+              <StyledPaper>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                  <Box>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{
+                        textDecoration: task.completed ? 'line-through' : 'none',
+                        color: task.completed ? 'text.secondary' : 'text.primary',
+                      }}
+                    >
+                      {task.title}
+                    </Typography>
+                    <Box display="flex" alignItems="center" mt={1} gap={1}>
+                      {task.dueDate && (
+                        <Chip
+                          icon={<TodayIcon fontSize="small" />}
+                          label={new Date(task.dueDate).toLocaleDateString()}
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                      <PriorityChip priority={task.priority} />
+                    </Box>
+                  </Box>
+                  <IconButton 
+                    size="small"
+                    onClick={(e) => handleMenuClick(e, task)}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </Box>
+                <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+                  <Checkbox
+                    checked={task.completed}
+                    onChange={() => toggleTask(task.id)}
+                    icon={<RadioButtonUncheckedIcon />}
+                    checkedIcon={<CheckCircleIcon color="primary" />}
+                  />
+                  <Box>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => toggleImportant(task.id)}
+                      color={task.important ? 'warning' : 'default'}
+                    >
+                      {task.important ? <StarIcon /> : <StarBorderIcon />}
+                    </IconButton>
+                  </Box>
+                </Box>
+              </StyledPaper>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
+      {/* Task menu */}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -370,7 +532,7 @@ const Tasks = () => {
           Delete Task
         </MenuItem>
       </Menu>
-    </Box>
+    </PageLayout>
   );
 };
 
