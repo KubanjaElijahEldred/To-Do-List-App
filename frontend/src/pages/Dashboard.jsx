@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   Box, 
   Typography, 
@@ -6,6 +6,7 @@ import {
   Grid, 
   Card, 
   CardContent, 
+  CardActions,
   CircularProgress,
   useTheme,
   useMediaQuery,
@@ -13,7 +14,15 @@ import {
   Button,
   Avatar,
   Stack,
-  Divider
+  Divider,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Menu,
+  MenuItem,
+  Tooltip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -27,62 +36,129 @@ import {
   AccessTime as TimeIcon,
   Whatshot as WhatshotIcon,
   EmojiEvents as TrophyIcon,
-  Person as PersonIcon
+  Person as PersonIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
+import { useAppContext } from '../contexts/AppContext';
 
-// Card component for stats
-const StatCard = ({ title, value, icon: Icon, color, unit }) => (
-  <Card sx={{ 
-    borderRadius: 3, 
-    p: 2,
-    height: '100%',
-    minHeight: '140px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    background: `linear-gradient(135deg, ${color} 0%, ${color}40 100%)`,
-    color: 'white',
-    position: 'relative',
-    overflow: 'hidden',
-    transition: 'all 0.3s ease-in-out',
-    '&:hover': {
-      transform: 'translateY(-4px)',
-      boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
-    }
-  }}>
-    <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" fontWeight="bold" sx={{ lineHeight: 1.2, mb: 1 }}>
-            {value}
-            <Typography component="span" variant="h6" sx={{ opacity: 0.9, ml: 0.5, fontSize: '0.8em' }}>
-              {unit}
+// StatCard component with CRUD operations
+const StatCard = ({ title, value, icon: Icon, color, unit, onEdit, onDelete }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedValue, setEditedValue] = useState(value);
+
+  const handleMenuOpen = (event) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    handleMenuClose();
+  };
+
+  const handleSave = () => {
+    onEdit(editedValue);
+    setIsEditing(false);
+  };
+
+  return (
+    <Card sx={{ 
+      borderRadius: 2, 
+      p: 3,
+      height: '100%',
+      minHeight: '200px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      background: `linear-gradient(135deg, ${color} 0%, ${color}40 100%)`,
+      color: 'white',
+      position: 'relative',
+      overflow: 'hidden',
+      transition: 'all 0.3s ease-in-out',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+      }
+    }}>
+      <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1 }}>
+              <Typography variant="h4" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
+                {value}
+              </Typography>
+              <Typography component="span" variant="h6" sx={{ opacity: 0.9, ml: 1, mb: 0.5, fontSize: '0.8em' }}>
+                {unit}
+              </Typography>
+            </Box>
+            <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 500, mb: 2 }}>
+              {title}
             </Typography>
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
-            {title}
-          </Typography>
-        </Box>
-        <Box sx={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          bgcolor: 'rgba(255,255,255,0.2)',
-          display: 'flex',
-          flexShrink: 0,
-          ml: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          '& svg': {
-            fontSize: '1.5rem'
-          }
-        }}>
-          <Icon sx={{ color: 'white' }} />
+          </Box>
+          <Box sx={{
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            bgcolor: 'rgba(255,255,255,0.2)',
+            display: 'flex',
+            flexShrink: 0,
+            ml: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            '& svg': {
+              fontSize: '1.8rem',
+              opacity: 0.9
+            }
+          }}>
+            <Icon sx={{ color: 'white' }} />
+          </Box>
+          <IconButton
+            size="small"
+            onClick={handleMenuOpen}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              color: 'rgba(255,255,255,0.8)',
+              '&:hover': {
+                backgroundColor: 'rgba(255,255,255,0.1)'
+              }
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <MenuItem onClick={handleEdit}>
+              <EditIcon sx={{ mr: 1 }} /> Edit
+            </MenuItem>
+            <MenuItem onClick={onDelete}>
+              <DeleteIcon sx={{ mr: 1 }} /> Delete
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
-    </Box>
-  </Card>
-);
+    </Card>
+  );
+};
 
 // Activity item component
 const ActivityItem = ({ icon: Icon, title, time, value, color }) => (
@@ -186,6 +262,27 @@ const Dashboard = () => {
     );
   }
 
+  const { tasks, addTask, updateTask, deleteTask } = useAppContext();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    status: 'To Do',
+    priority: 'Medium'
+  });
+
+  const handleAddTask = () => {
+    if (newTask.title.trim()) {
+      addTask(newTask);
+      setNewTask({ title: '', status: 'To Do', priority: 'Medium' });
+      setIsAddDialogOpen(false);
+    }
+  };
+
+  const handleUpdateStat = (statType, value) => {
+    // This is where you'd update the stats in your state
+    console.log(`Updating ${statType} to ${value}`);
+  };
+
   return (
     <Box sx={{ 
       p: { xs: 2, sm: 3 },
@@ -224,15 +321,46 @@ const Dashboard = () => {
         </Avatar>
       </Box>
 
+      {/* Header with Add Button */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" fontWeight="bold" sx={{ 
+          fontSize: { xs: '1.5rem', sm: '2rem' },
+          background: 'linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          display: 'inline-block',
+        }}>
+          Dashboard
+        </Typography>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />}
+          onClick={() => setIsAddDialogOpen(true)}
+          sx={{ 
+            bgcolor: 'primary.main',
+            '&:hover': {
+              bgcolor: 'primary.dark',
+              transform: 'translateY(-2px)'
+            },
+            transition: 'all 0.3s ease-in-out',
+            boxShadow: 2
+          }}
+        >
+          Add Task
+        </Button>
+      </Box>
+
       {/* Stats Grid */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard 
-            title="Calories Burned" 
-            value="2,450" 
+            title="Total Tasks" 
+            value={tasks.length.toString()} 
             icon={FireIcon} 
             color="#FF6B6B" 
-            unit="kcal"
+            unit="tasks"
+            onEdit={(newValue) => handleUpdateStat('tasks', newValue)}
+            onDelete={() => {}}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
