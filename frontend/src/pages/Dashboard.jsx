@@ -10,103 +10,143 @@ import {
   useTheme,
   useMediaQuery,
   IconButton,
-  Button
+  Button,
+  Avatar,
+  Stack,
+  Divider
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
-  Assignment as AssignmentIcon,
-  CheckCircle as CheckCircleIcon,
-  Group as GroupIcon,
-  TrendingUp as TrendingUpIcon,
-  Refresh as RefreshIcon
+  LocalFireDepartment as FireIcon,
+  DirectionsRun as RunIcon,
+  Favorite as HeartIcon,
+  WaterDrop as WaterIcon,
+  ChevronRight as ChevronRightIcon,
+  MoreVert as MoreVertIcon,
+  FitnessCenter as FitnessCenterIcon,
+  AccessTime as TimeIcon,
+  Whatshot as WhatshotIcon,
+  EmojiEvents as TrophyIcon,
+  Person as PersonIcon
 } from '@mui/icons-material';
-import { keyframes } from '@mui/system';
 
-const spin = keyframes`
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-`;
-
-const StyledRefreshIcon = styled(RefreshIcon)({
-  '&.spin': {
-    animation: `${spin} 1s linear infinite`,
-  },
-});
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: { xs: theme.spacing(2), md: theme.spacing(3) },
-  marginBottom: theme.spacing(3),
-  borderRadius: 12,
-  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-}));
-
-const StatCard = ({ title, value, icon: Icon, color }) => (
-  <Card sx={{ height: '100%', borderRadius: 3, borderLeft: `4px solid ${color}` }}>
-    <CardContent>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Box
-          sx={{
-            backgroundColor: `${color}20`,
-            borderRadius: '50%',
-            width: 48,
-            height: 48,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mr: 2,
-          }}
-        >
-          <Icon sx={{ color: color, fontSize: 28 }} />
-        </Box>
+// Card component for stats
+const StatCard = ({ title, value, icon: Icon, color, unit }) => (
+  <Card sx={{ 
+    borderRadius: 3, 
+    p: 2,
+    height: '100%',
+    background: `linear-gradient(135deg, ${color} 0%, ${color}40 100%)`,
+    color: 'white',
+    position: 'relative',
+    overflow: 'hidden',
+    '&:hover': {
+      transform: 'translateY(-4px)',
+      transition: 'transform 0.3s ease-in-out',
+      boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+    }
+  }}>
+    <Box sx={{ position: 'relative', zIndex: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h6" component="div" fontWeight="bold">
+          <Typography variant="h4" fontWeight="bold">
             {value}
+            <Typography component="span" variant="h6" sx={{ opacity: 0.8, ml: 0.5 }}>
+              {unit}
+            </Typography>
           </Typography>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
             {title}
           </Typography>
         </Box>
+        <Box sx={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          bgcolor: 'rgba(255,255,255,0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Icon sx={{ color: 'white' }} />
+        </Box>
       </Box>
-    </CardContent>
+    </Box>
   </Card>
+);
+
+// Activity item component
+const ActivityItem = ({ icon: Icon, title, time, value, color }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, p: 1, borderRadius: 2, '&:hover': { bgcolor: 'action.hover' } }}>
+    <Box sx={{
+      width: 40,
+      height: 40,
+      borderRadius: '12px',
+      bgcolor: `${color}20`,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      mr: 2,
+      color: color
+    }}>
+      <Icon />
+    </Box>
+    <Box sx={{ flex: 1 }}>
+      <Typography variant="subtitle2" fontWeight="medium">{title}</Typography>
+      <Typography variant="caption" color="text.secondary">{time}</Typography>
+    </Box>
+    <Typography variant="subtitle2" fontWeight="bold" color={color}>
+      {value}
+    </Typography>
+  </Box>
 );
 
 const Dashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  
+  // State for fitness data
   const [stats, setStats] = useState({
-    totalTasks: 0,
-    completedTasks: 0,
-    teamMembers: 0,
-    productivity: 0
+    calories: '2,450',
+    steps: '12,548',
+    heartRate: '128',
+    water: '2.5',
   });
-  const [recentActivities, setRecentActivities] = useState([]);
+
+  const [activities, setActivities] = useState([
+    { id: 1, title: 'Morning Run', time: 'Today, 07:30 AM', value: '5.2 km', icon: RunIcon, color: '#FF6B6B' },
+    { id: 2, title: 'Weight Training', time: 'Today, 06:15 AM', value: '45 min', icon: FitnessCenterIcon, color: '#4ECDC4' },
+    { id: 3, title: 'Water Intake', time: 'Today, 03:45 PM', value: '1.2 L', icon: WaterIcon, color: '#6C63FF' },
+  ]);
+
+  const [workoutPlan, setWorkoutPlan] = useState({
+    title: 'Full Body Workout',
+    time: '45 min',
+    calories: '320',
+    exercises: [
+      { name: 'Warm Up', time: '5 min' },
+      { name: 'Jumping Jacks', time: '1 min' },
+      { name: 'Push Ups', time: '3 x 12' },
+      { name: 'Squats', time: '3 x 15' },
+      { name: 'Plank', time: '1 min' },
+    ]
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         // TODO: Replace with actual API call
-        // const response = await fetch('/api/dashboard');
+        // const response = await fetch('/api/fitness-stats');
         // const data = await response.json();
         // setStats(data.stats);
-        // setRecentActivities(data.recentActivities);
-        
-        // For now, set empty data
-        setStats({
-          totalTasks: 0,
-          completedTasks: 0,
-          teamMembers: 0,
-          productivity: 0
-        });
-        setRecentActivities([]);
+        // setActivities(data.activities);
+        // setWorkoutPlan(data.workoutPlan);
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Error fetching fitness data:', error);
       } finally {
         setLoading(false);
       }
@@ -140,92 +180,119 @@ const Dashboard = () => {
   return (
     <Box sx={{ 
       p: { xs: 2, sm: 3 },
-      pt: { xs: 7, sm: 8 },
+      pt: { xs: 8, sm: 9 },
       maxWidth: '100%',
-      overflowX: 'hidden'
+      overflowX: 'hidden',
+      backgroundColor: '#f8f9fa',
+      minHeight: '100vh',
+      fontFamily: '"Poppins", sans-serif'
     }}>
+      {/* Header */}
       <Box sx={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
-        mb: 3,
-        flexWrap: 'wrap',
-        gap: 2
+        mb: 4
       }}>
-        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-          Dashboard Overview
-        </Typography>
         <Box>
-          <IconButton 
-            color="primary" 
-            aria-label="refresh" 
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            <StyledRefreshIcon className={refreshing ? 'spin' : ''} />
-          </IconButton>
+          <Typography variant="h4" fontWeight="bold" sx={{ 
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            background: 'linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            display: 'inline-block',
+            fontFamily: '"Poppins", sans-serif'
+          }}>
+            FitTrack
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Welcome back, Alex!
+          </Typography>
         </Box>
+        <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+          <PersonIcon />
+        </Avatar>
       </Box>
-      
-      <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 3 }}>
-        {[
-          { title: 'Total Tasks', value: stats.totalTasks, icon: AssignmentIcon, color: theme.palette.primary.main },
-          { title: 'Completed', value: `${stats.completedTasks}/${stats.totalTasks}`, icon: CheckCircleIcon, color: '#4caf50' },
-          { title: 'Team Members', value: stats.teamMembers, icon: GroupIcon, color: '#9c27b0' },
-          { title: 'Productivity', value: `${stats.productivity}%`, icon: TrendingUpIcon, color: '#ff9800' }
-        ].map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: 'flex' }}>
-            <StatCard
-              title={stat.title}
-              value={stat.value}
-              icon={stat.icon}
-              color={stat.color}
-            />
-          </Grid>
-        ))}
+
+      {/* Stats Grid */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid xs={6}>
+          <StatCard 
+            title="Calories" 
+            value="2,450" 
+            icon={FireIcon} 
+            color="#FF6B6B" 
+            unit="kcal"
+          />
+        </Grid>
+        <Grid xs={6}>
+          <StatCard 
+            title="Steps" 
+            value="12,548" 
+            icon={RunIcon} 
+            color="#4ECDC4" 
+            unit="steps"
+          />
+        </Grid>
+        <Grid xs={6}>
+          <StatCard 
+            title="Heart Rate" 
+            value="128" 
+            icon={HeartIcon} 
+            color="#FF9E80" 
+            unit="bpm"
+          />
+        </Grid>
+        <Grid xs={6}>
+          <StatCard 
+            title="Water" 
+            value="2.5" 
+            icon={WaterIcon} 
+            color="#6C63FF" 
+            unit="L"
+          />
+        </Grid>
       </Grid>
 
-      <Grid container spacing={2} sx={{ width: '100%', mx: 0 }}>
-        <Grid item xs={12} lg={8} sx={{ px: 1 }}>
-          <StyledPaper sx={{ 
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 2
-            }}>
-              <Typography variant="h6" fontWeight="bold">
-                Task Overview
-              </Typography>
+      {/* Workout Plan */}
+      <Card sx={{ 
+        mb: 3, 
+        borderRadius: 3,
+        boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+        background: 'white',
+        overflow: 'hidden'
+      }}>
+        <Box sx={{ p: 2, bgcolor: 'primary.main', color: 'white' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h6" fontWeight="bold">Today's Workout</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>Full Body Workout</Typography>
             </Box>
             <Box sx={{ 
-              flexGrow: 1,
-              backgroundColor: theme.palette.background.paper,
-              borderRadius: 2,
-              p: 2,
-              height: '300px',
+              bgcolor: 'rgba(255,255,255,0.2)', 
+              px: 1.5, 
+              py: 0.5, 
+              borderRadius: 4,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: `1px solid ${theme.palette.divider}`
+              alignItems: 'center'
             }}>
-              <Typography color="textSecondary">
-                Task completion chart will be displayed here
-              </Typography>
+              <TimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
+              <Typography variant="caption">45 min</Typography>
             </Box>
-          </StyledPaper>
-        </Grid>
-        <Grid item xs={12} lg={4} sx={{ px: 1 }}>
-          <StyledPaper sx={{ height: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" fontWeight="bold">
-                Recent Activity
-              </Typography>
-              <Button size="small" color="primary">View All</Button>
+          </Box>
+        </Box>
+        
+        <Box sx={{ p: 2 }}>
+          {workoutPlan.exercises.map((exercise, index) => (
+            <Box key={index} sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              py: 1.5,
+              borderBottom: index !== workoutPlan.exercises.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none'
+            }}>
+              <Typography>{exercise.name}</Typography>
+              <Typography variant="body2" color="text.secondary">{exercise.time}</Typography>
             </Box>
             {loading ? (
               <Box display="flex" justifyContent="center" p={4}>
