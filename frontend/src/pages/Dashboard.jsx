@@ -1,18 +1,46 @@
-import React from 'react';
-import { Box, Typography, Paper, Grid, Card, CardContent } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Typography, 
+  Paper, 
+  Grid, 
+  Card, 
+  CardContent, 
+  CircularProgress,
+  useTheme,
+  useMediaQuery,
+  IconButton,
+  Button
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
   Assignment as AssignmentIcon,
   CheckCircle as CheckCircleIcon,
   Group as GroupIcon,
-  TrendingUp as TrendingUpIcon
+  TrendingUp as TrendingUpIcon,
+  Refresh as RefreshIcon
 } from '@mui/icons-material';
+import { keyframes } from '@mui/system';
+
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
+const StyledRefreshIcon = styled(RefreshIcon)({
+  '&.spin': {
+    animation: `${spin} 1s linear infinite`,
+  },
+});
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
+  padding: { xs: theme.spacing(2), md: theme.spacing(3) },
   marginBottom: theme.spacing(3),
   borderRadius: 12,
   boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)',
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
 const StatCard = ({ title, value, icon: Icon, color }) => (
@@ -47,104 +75,214 @@ const StatCard = ({ title, value, icon: Icon, color }) => (
 );
 
 const Dashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState({
+    totalTasks: 0,
+    completedTasks: 0,
+    teamMembers: 0,
+    productivity: 0
+  });
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // TODO: Replace with actual API call
+        // const response = await fetch('/api/dashboard');
+        // const data = await response.json();
+        // setStats(data.stats);
+        // setRecentActivities(data.recentActivities);
+        
+        // For now, set empty data
+        setStats({
+          totalTasks: 0,
+          completedTasks: 0,
+          teamMembers: 0,
+          productivity: 0
+        });
+        setRecentActivities([]);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // TODO: Replace with actual refresh logic
+    // fetchData().finally(() => setRefreshing(false));
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: 'calc(100vh - 200px)' 
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ p: 3, mt: 8 }}>
-      <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-        Dashboard Overview
-      </Typography>
+    <Box sx={{ 
+      p: { xs: 2, sm: 3 },
+      pt: { xs: 7, sm: 8 },
+      maxWidth: '100%',
+      overflowX: 'hidden'
+    }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 3,
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+          Dashboard Overview
+        </Typography>
+        <Box>
+          <IconButton 
+            color="primary" 
+            aria-label="refresh" 
+            onClick={handleRefresh}
+            disabled={refreshing}
+          >
+            <StyledRefreshIcon className={refreshing ? 'spin' : ''} />
+          </IconButton>
+        </Box>
+      </Box>
       
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Tasks"
-            value="128"
-            icon={AssignmentIcon}
-            color="#3f51b5"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Completed"
-            value="84"
-            icon={CheckCircleIcon}
-            color="#4caf50"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Team Members"
-            value="12"
-            icon={GroupIcon}
-            color="#ff9800"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Productivity"
-            value="87%"
-            icon={TrendingUpIcon}
-            color="#e91e63"
-          />
-        </Grid>
+      <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 3 }}>
+        {[
+          { title: 'Total Tasks', value: stats.totalTasks, icon: AssignmentIcon, color: theme.palette.primary.main },
+          { title: 'Completed', value: `${stats.completedTasks}/${stats.totalTasks}`, icon: CheckCircleIcon, color: '#4caf50' },
+          { title: 'Team Members', value: stats.teamMembers, icon: GroupIcon, color: '#9c27b0' },
+          { title: 'Productivity', value: `${stats.productivity}%`, icon: TrendingUpIcon, color: '#ff9800' }
+        ].map((stat, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index} sx={{ display: 'flex' }}>
+            <StatCard
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          </Grid>
+        ))}
       </Grid>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <StyledPaper>
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              Task Overview
-            </Typography>
-            <Box height={300}>
-              {/* Placeholder for chart */}
-              <Box
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: 2,
-                }}
-              >
-                <Typography color="textSecondary">Task completion chart will be displayed here</Typography>
-              </Box>
+      <Grid container spacing={2} sx={{ width: '100%', mx: 0 }}>
+        <Grid item xs={12} lg={8} sx={{ px: 1 }}>
+          <StyledPaper sx={{ 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2
+            }}>
+              <Typography variant="h6" fontWeight="bold">
+                Task Overview
+              </Typography>
+            </Box>
+            <Box sx={{ 
+              flexGrow: 1,
+              backgroundColor: theme.palette.background.paper,
+              borderRadius: 2,
+              p: 2,
+              height: '300px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: `1px solid ${theme.palette.divider}`
+            }}>
+              <Typography color="textSecondary">
+                Task completion chart will be displayed here
+              </Typography>
             </Box>
           </StyledPaper>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <StyledPaper>
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              Recent Activities
-            </Typography>
-            <Box>
-              {[1, 2, 3, 4].map((item) => (
-                <Box key={item} sx={{ display: 'flex', mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
+        <Grid item xs={12} lg={4} sx={{ px: 1 }}>
+          <StyledPaper sx={{ height: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">
+                Recent Activity
+              </Typography>
+              <Button size="small" color="primary">View All</Button>
+            </Box>
+            {loading ? (
+              <Box display="flex" justifyContent="center" p={4}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Box sx={{ overflowY: 'auto', maxHeight: 400 }}>
+                {recentActivities.map((activity) => (
                   <Box
+                    key={activity.id}
                     sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      backgroundColor: '#e3f2fd',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      mr: 2,
-                      flexShrink: 0,
+                      py: 1.5,
+                      px: 1,
+                      borderRadius: 1,
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                      },
+                      mb: 1,
                     }}
                   >
-                    <AssignmentIcon color="primary" fontSize="small" />
+                    <Box
+                      sx={{
+                        backgroundColor: 'primary.light',
+                        color: 'primary.contrastText',
+                        borderRadius: '50%',
+                        minWidth: 36,
+                        width: 36,
+                        height: 36,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {activity.type === 'task' ? (
+                        <AssignmentIcon fontSize="small" />
+                      ) : activity.type === 'team' ? (
+                        <GroupIcon fontSize="small" />
+                      ) : (
+                        <TrendingUpIcon fontSize="small" />
+                      )}
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight="medium" noWrap>
+                        {activity.title}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {activity.time}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box>
-                    <Typography variant="body2" fontWeight="medium">
-                      Task {item} completed
-                    </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      {item * 2} hours ago
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
+                ))}
+              </Box>
+            )}
           </StyledPaper>
         </Grid>
       </Grid>

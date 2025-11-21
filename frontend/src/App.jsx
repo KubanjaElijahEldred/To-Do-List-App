@@ -1,20 +1,18 @@
-import React, { createContext } from 'react';
+import React, { createContext, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import { IconButton, useTheme } from '@mui/material';
+import { ThemeProvider, createTheme, useTheme, useMediaQuery, IconButton, CssBaseline, Box, Button, Typography } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-// Create a context for the color mode
-export const ColorModeContext = createContext({ toggleColorMode: () => {} });
+// Import components
 import Sidebar from './components/layout/Sidebar';
 import Topbar from './components/layout/Topbar';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
+import Team from './pages/team';
+
+// Create a context for the color mode
+export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
 // Create a theme instance with orange as primary color
 const getDesignTokens = (mode) => ({
@@ -204,16 +202,15 @@ function App() {
               }
             />
             <Route
-              path="/team"
+              path="/team/*"
               element={
                 <Layout>
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Team</Typography>
-                    {/* Team content will go here */}
-                  </Box>
+                  <Team />
                 </Layout>
               }
-            />
+            >
+              <Route path="*" element={<Team />} />
+            </Route>
             <Route
               path="/reports"
               element={
