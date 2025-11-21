@@ -291,9 +291,9 @@ const Tasks = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography 
-                          variant="body1" 
+                          variant="body1"
                           sx={{ 
                             textDecoration: task.completed ? 'line-through' : 'none',
                             color: task.completed ? 'text.secondary' : 'text.primary',
@@ -301,17 +301,25 @@ const Tasks = () => {
                         >
                           {task.text}
                         </Typography>
-                  <IconButton 
-                    edge="end" 
-                    onClick={(e) => handleMenuClick(e, task)}
-                  >
-                    <MoreVertIcon />
-                    {task.priority === 'high' ? (
-                      <StarIcon color="warning" />
-                    ) : (
-                      <StarBorderIcon />
-                    )}
-                  </IconButton>
+                        <Box>
+                          <IconButton 
+                            size="small"
+                            onClick={() => toggleImportant(task.id)}
+                            color={task.priority === 'high' ? 'warning' : 'default'}
+                          >
+                            {task.priority === 'high' ? <StarIcon /> : <StarBorderIcon />}
+                          </IconButton>
+                          <IconButton 
+                            edge="end" 
+                            onClick={(e) => handleMenuClick(e, task)}
+                            size="small"
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    }
+                  />
                 </ListItem>
                 <Divider component="li" />
               </React.Fragment>
