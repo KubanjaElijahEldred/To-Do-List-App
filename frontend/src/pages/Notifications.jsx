@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Typography, 
@@ -11,6 +11,9 @@ import {
   Badge,
   Divider,
   IconButton,
+  TextField,
+  InputAdornment,
+  Button,
   useTheme
 } from '@mui/material';
 import { 
@@ -18,11 +21,15 @@ import {
   CheckCircleOutline as CheckCircleOutlineIcon,
   DeleteOutline as DeleteOutlineIcon,
   NotificationsNone as NotificationsNoneIcon,
-  NotificationsActive as NotificationsActiveIcon
+  NotificationsActive as NotificationsActiveIcon,
+  Assignment as AssignmentIcon,
+  Group as GroupIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 
 const Notifications = () => {
   const theme = useTheme();
+  const [searchTerm, setSearchTerm] = useState('');
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -56,9 +63,20 @@ const Notifications = () => {
     ));
   };
 
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    // TODO: Add API call to clear notifications in the backend
+  };
+
   const deleteNotification = (id) => {
     setNotifications(notifications.filter(notification => notification.id !== id));
+    // TODO: Add API call to delete notification in the backend
   };
+
+  const filteredNotifications = notifications.filter(notification => 
+    notification.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    notification.message.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const markAllAsRead = () => {
     setNotifications(notifications.map(notification => ({
@@ -70,33 +88,76 @@ const Notifications = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <Box sx={{ p: 3, pt: 8 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, justifyContent: 'space-between' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Badge badgeContent={unreadCount} color="error">
-            <NotificationsIcon sx={{ fontSize: 32, mr: 2, color: theme.palette.primary.main }} />
-          </Badge>
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            Notifications
-          </Typography>
+    <Box sx={{ p: 3 }}>
+      <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Badge badgeContent={unreadCount} color="error" sx={{ mr: 2 }}>
+              <NotificationsIcon sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+            </Badge>
+            <Typography variant="h5" component="h1" fontWeight="bold">
+              Notifications
+            </Typography>
+          </Box>
+          <TextField
+            size="small"
+            placeholder="Search notifications..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ width: 300 }}
+          />
         </Box>
-        {unreadCount > 0 && (
-          <Box>
-            <IconButton 
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="body2" color="textSecondary">
+            {unreadCount} unread {unreadCount === 1 ? 'notification' : 'notifications'}
+          </Typography>
+          {unreadCount > 0 && (
+            <Button 
               onClick={markAllAsRead}
-              color="primary"
               size="small"
+              startIcon={<CheckCircleOutlineIcon />}
               sx={{ textTransform: 'none' }}
             >
-              <CheckCircleOutlineIcon sx={{ mr: 1 }} />
               Mark all as read
-            </IconButton>
-          </Box>
-        )}
-      </Box>
+            </Button>
+          )}
+        </Box>
+      </Paper>
       
-      <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-        {notifications.length === 0 ? (
+      <Paper elevation={3} sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Badge badgeContent={unreadCount} color="error">
+              <NotificationsIcon sx={{ fontSize: 32, mr: 2, color: theme.palette.primary.main }} />
+            </Badge>
+            <Typography variant="h4" component="h1" fontWeight="bold">
+              Notifications
+            </Typography>
+          </Box>
+          {unreadCount > 0 && (
+            <Box>
+              <IconButton 
+                onClick={markAllAsRead}
+                color="primary"
+                size="small"
+                sx={{ textTransform: 'none' }}
+              >
+                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                Mark all as read
+              </IconButton>
+            </Box>
+          )}
+        </Box>
+        
+        {filteredNotifications.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <NotificationsNoneIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="textSecondary">
@@ -108,7 +169,7 @@ const Notifications = () => {
           </Box>
         ) : (
           <List disablePadding>
-            {notifications.map((notification, index) => (
+            {filteredNotifications.map((notification, index) => (
               <React.Fragment key={notification.id}>
                 {index > 0 && <Divider />}
                 <ListItem 

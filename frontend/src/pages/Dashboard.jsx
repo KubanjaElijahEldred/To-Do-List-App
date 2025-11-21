@@ -36,26 +36,30 @@ const StatCard = ({ title, value, icon: Icon, color, unit }) => (
     borderRadius: 3, 
     p: 2,
     height: '100%',
+    minHeight: '140px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     background: `linear-gradient(135deg, ${color} 0%, ${color}40 100%)`,
     color: 'white',
     position: 'relative',
     overflow: 'hidden',
+    transition: 'all 0.3s ease-in-out',
     '&:hover': {
       transform: 'translateY(-4px)',
-      transition: 'transform 0.3s ease-in-out',
       boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
     }
   }}>
-    <Box sx={{ position: 'relative', zIndex: 1 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Box>
-          <Typography variant="h4" fontWeight="bold">
+    <Box sx={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flex: 1 }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ lineHeight: 1.2, mb: 1 }}>
             {value}
-            <Typography component="span" variant="h6" sx={{ opacity: 0.8, ml: 0.5 }}>
+            <Typography component="span" variant="h6" sx={{ opacity: 0.9, ml: 0.5, fontSize: '0.8em' }}>
               {unit}
             </Typography>
           </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+          <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
             {title}
           </Typography>
         </Box>
@@ -65,8 +69,13 @@ const StatCard = ({ title, value, icon: Icon, color, unit }) => (
           borderRadius: '50%',
           bgcolor: 'rgba(255,255,255,0.2)',
           display: 'flex',
+          flexShrink: 0,
+          ml: 1,
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          '& svg': {
+            fontSize: '1.5rem'
+          }
         }}>
           <Icon sx={{ color: 'white' }} />
         </Box>
@@ -185,7 +194,8 @@ const Dashboard = () => {
       overflowX: 'hidden',
       backgroundColor: '#f8f9fa',
       minHeight: '100vh',
-      fontFamily: '"Poppins", sans-serif'
+      fontFamily: '"Poppins", sans-serif',
+      boxSizing: 'border-box'
     }}>
       {/* Header */}
       <Box sx={{ 
@@ -216,6 +226,42 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard 
+            title="Calories Burned" 
+            value="2,450" 
+            icon={FireIcon} 
+            color="#FF6B6B" 
+            unit="kcal"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard 
+            title="Steps" 
+            value="12,548" 
+            icon={RunIcon} 
+            color="#4ECDC4" 
+            unit="steps"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard 
+            title="Heart Rate" 
+            value="128" 
+            icon={HeartIcon} 
+            color="#FF9E80" 
+            unit="bpm"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard 
+            title="Water Intake" 
+            value="2.5" 
+            icon={WaterIcon} 
+            color="#6C63FF" 
+            unit="L"
+          />
+        </Grid>
         <Grid xs={6}>
           <StatCard 
             title="Calories" 
