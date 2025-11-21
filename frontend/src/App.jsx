@@ -10,6 +10,8 @@ import Topbar from './components/layout/Topbar';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Team from './pages/team';
+import Reports from './pages/Reports';
+import Notifications from './pages/Notifications';
 
 // Create a context for the color mode
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -215,10 +217,15 @@ function App() {
               path="/reports"
               element={
                 <Layout>
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Reports</Typography>
-                    {/* Reports content will go here */}
-                  </Box>
+                  <Reports />
+                </Layout>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <Layout>
+                  <Notifications />
                 </Layout>
               }
             />
