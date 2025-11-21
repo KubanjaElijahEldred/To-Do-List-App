@@ -12,6 +12,8 @@ import Tasks from './pages/Tasks';
 import Team from './pages/team';
 import Reports from './pages/Reports';
 import Notifications from './pages/Notifications';
+import Help from './pages/Help';
+import Profile from './pages/Profile';
 
 // Create a context for the color mode
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -237,6 +239,22 @@ function App() {
                     <Typography variant="h4">Settings</Typography>
                     {/* Settings content will go here */}
                   </Box>
+                </Layout>
+              }
+            />
+            <Route
+              path="/help"
+              element={
+                <Layout>
+                  <Help />
+                </Layout>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <Layout>
+                  <Profile />
                 </Layout>
               }
             />
