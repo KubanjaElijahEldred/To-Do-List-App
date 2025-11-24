@@ -345,7 +345,7 @@ const Settings = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <Grid container spacing={3}>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <TextField
                   fullWidth
                   label="Display Name"
@@ -354,7 +354,7 @@ const Settings = () => {
                   margin="normal"
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <TextField
                   fullWidth
                   label="Email"
@@ -364,7 +364,7 @@ const Settings = () => {
                   type="email"
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid>
                 <TextField
                   fullWidth
                   label="Bio"
@@ -384,7 +384,7 @@ const Settings = () => {
             </Typography>
             <Divider sx={{ mb: 3 }} />
             <Grid container spacing={3}>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="language-label">Language</InputLabel>
                   <Select
@@ -401,7 +401,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="timezone-label">Time Zone</InputLabel>
                   <Select
@@ -417,7 +417,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="date-format-label">Date Format</InputLabel>
                   <Select
@@ -432,7 +432,7 @@ const Settings = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid>
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="time-format-label">Time Format</InputLabel>
                   <Select
@@ -479,7 +479,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <EmailIcon color="primary" sx={{ mr: 1 }} />
@@ -555,7 +555,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <InfoIcon color="primary" sx={{ mr: 1 }} />
@@ -623,7 +623,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <LockIcon color="primary" sx={{ mr: 1 }} />
@@ -824,7 +824,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <PaletteIcon color="primary" sx={{ mr: 1 }} />
@@ -985,7 +985,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <TypographyIcon color="primary" sx={{ mr: 1 }} />
@@ -1066,7 +1066,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Account Information
@@ -1170,7 +1170,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Danger Zone
@@ -1265,7 +1265,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <CodeIcon color="primary" sx={{ mr: 1 }} />
@@ -1298,7 +1298,7 @@ const Settings = () => {
               </Paper>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid>
               <Paper elevation={0} sx={{ p: 2, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <BackupIcon color="primary" sx={{ mr: 1 }} />
@@ -1375,7 +1375,7 @@ const Settings = () => {
           <Divider sx={{ mb: 3 }} />
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid>
               <Card sx={{ mb: 2 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -1400,7 +1400,7 @@ const Settings = () => {
               </Card>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid>
               <Card sx={{ mb: 2 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

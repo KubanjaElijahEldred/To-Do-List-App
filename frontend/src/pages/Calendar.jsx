@@ -269,7 +269,7 @@ const Calendar = () => {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={3}>
           {/* Calendar Grid */}
-          <Grid xs={12} md={8}>
+          <Grid>
             <Paper sx={{ p: 2 }}>
               {/* Month Navigation */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -287,7 +287,7 @@ const Calendar = () => {
               {/* Day Headers */}
               <Grid container spacing={1} sx={{ mb: 1 }}>
                 {dayNames.map((day) => (
-                  <Grid xs={12/7} key={day}>
+                  <Grid key={day}>
                     <Typography variant="body2" fontWeight="bold" textAlign="center">
                       {day}
                     </Typography>
@@ -298,7 +298,7 @@ const Calendar = () => {
               {/* Calendar Days */}
               <Grid container spacing={1}>
                 {generateCalendarDays().map((day, index) => (
-                  <Grid xs={12/7} key={index}>
+                  <Grid key={index}>
                     <CalendarDay
                       day={day}
                       isCurrentMonth={day !== null}
@@ -311,7 +311,7 @@ const Calendar = () => {
           </Grid>
 
           {/* Events Sidebar */}
-          <Grid xs={12} md={4}>
+          <Grid>
             <Paper sx={{ p: 2 }}>
               <Typography variant="h6" gutterBottom>
                 Events for {selectedDate.toLocaleDateString()}

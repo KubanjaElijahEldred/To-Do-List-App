@@ -52,13 +52,14 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const PriorityChip = ({ priority }) => {
   const priorityMap = {
+    urgent: { label: 'Urgent', color: 'error' },
     high: { label: 'High', color: 'error' },
     medium: { label: 'Medium', color: 'warning' },
     low: { label: 'Low', color: 'primary' },
   };
 
   const { label, color } = priorityMap[priority] || { label: 'Low', color: 'default' };
-  return <Chip label={label} color={color} size="small" variant="outlined" />;
+  return <Chip label={label} color={color} size="small" variant="outlined" component="span" />;
 };
 
 const Tasks = () => {
@@ -423,20 +424,14 @@ const Tasks = () => {
                       </Typography>
                     }
                     secondary={
-                      <Box component="span">
-                        <Typography variant="body2" color="textSecondary">
+                      <>
+                        <Typography variant="body2" color="textSecondary" component="span">
                           {task.description}
                         </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Chip
-                            icon={<TodayIcon />}
-                            label={task.dueDate}
-                            size="small"
-                            variant="outlined"
-                            color={getPriorityColor(task.priority)}
-                          />
+                        <Box component="span" sx={{ ml: 1 }}>
+                          <PriorityChip priority={task.priority} />
                         </Box>
-                      </Box>
+                      </>
                     }
                   />
                 </ListItem>
@@ -448,7 +443,7 @@ const Tasks = () => {
       ) : (
         <Grid container spacing={2}>
           {searchedTasks.map((task) => (
-            <Grid xs={12} sm={6} md={4} lg={3} key={task.id}>
+            <Grid key={task.id}>
               <StyledPaper>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                   <Box>

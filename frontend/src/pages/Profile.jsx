@@ -93,7 +93,7 @@ const Profile = () => {
   };
 
   const renderField = (label, name, value, icon, type = 'text', required = false) => (
-    <Grid item xs={12} sm={6}>
+    <Grid>
       {editMode ? (
         <TextField
           fullWidth
@@ -262,7 +262,7 @@ const Profile = () => {
       </Paper>
 
       <Grid container spacing={4}>
-        <Grid item xs={12} md={8}>
+        <Grid>
           <Paper elevation={2} sx={{ p: 4, borderRadius: 2, mb: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h6" component="h2" fontWeight="bold">
@@ -280,7 +280,7 @@ const Profile = () => {
               {renderField('Position', 'position', formData.position, <WorkIcon />)}
               {renderField('Department', 'department', formData.department, <WorkIcon />)}
               
-              <Grid item xs={12}>
+              <Grid>
                 <FormControl fullWidth margin="normal">
                   <InputLabel htmlFor="bio" shrink>
                     Bio
@@ -312,7 +312,7 @@ const Profile = () => {
           </Paper>
         </Grid>
         
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper elevation={2} sx={{ p: 4, borderRadius: 2, mb: 4 }}>
             <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
               Account Security

@@ -15,7 +15,7 @@ const Team = () => {
       </Box>
       
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid>
           <Paper sx={{ p: 3, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>Team Members</Typography>
             <Typography color="textSecondary">

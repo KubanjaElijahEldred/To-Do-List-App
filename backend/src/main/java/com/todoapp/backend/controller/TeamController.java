@@ -39,7 +39,7 @@ public class TeamController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TeamMember> updateTeamMember(@PathVariable Long id, 
-                                                      @Valid @RequestBody TeamMemberRequest request) {
+                                                      @Valid @RequestBody TeamService.TeamMemberRequest request) {
         TeamMember member = teamService.updateTeamMember(id, request);
         return ResponseEntity.ok(member);
     }
