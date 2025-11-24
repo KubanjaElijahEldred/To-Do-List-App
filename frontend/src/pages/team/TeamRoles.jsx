@@ -190,7 +190,7 @@ const TeamRoles = () => {
 
       <Grid container spacing={3}>
         {roles.map((role) => (
-          <Grid item xs={12} md={6} lg={4} key={role.id}>
+          <Grid key={role.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

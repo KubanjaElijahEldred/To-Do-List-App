@@ -212,7 +212,7 @@ const Analytics = () => {
         <Box sx={{ flexGrow: 1 }}>
           {/* Stats Overview */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid>
               <StatCard
                 title="Total Tasks"
                 value={analyticsData.totalTasks}
@@ -222,7 +222,7 @@ const Analytics = () => {
                 color="#FF6B6B"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid>
               <StatCard
                 title="Completion Rate"
                 value={`${analyticsData.completionRate}%`}
@@ -232,7 +232,7 @@ const Analytics = () => {
                 color="#4ECDC4"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid>
               <StatCard
                 title="Avg. Completion Time"
                 value={analyticsData.averageCompletionTime}
@@ -242,7 +242,7 @@ const Analytics = () => {
                 color="#FF9E80"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid>
               <StatCard
                 title="Productivity Score"
                 value={analyticsData.productivityScore}
@@ -256,10 +256,10 @@ const Analytics = () => {
 
           {/* Charts and Progress */}
           <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
+            <Grid>
               <ProgressCard data={analyticsData.weeklyProgress} />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid>
               <CategoryCard data={analyticsData.categoryBreakdown} />
             </Grid>
           </Grid>

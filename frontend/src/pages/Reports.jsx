@@ -15,7 +15,7 @@ const Reports = () => {
       </Box>
       
       <Grid container spacing={3}>
-        <Grid xs={12} md={6}>
+        <Grid>
           <Paper sx={{ p: 3, height: '100%', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>Task Completion</Typography>
             <Typography color="textSecondary" paragraph>
@@ -23,7 +23,7 @@ const Reports = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid xs={12} md={6}>
+        <Grid>
           <Paper sx={{ p: 3, height: '100%', borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom>Team Performance</Typography>
             <Typography color="textSecondary" paragraph>

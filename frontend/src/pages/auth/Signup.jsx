@@ -165,6 +165,16 @@ const Signup = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  // Auto-redirect after 3 seconds
+  React.useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, navigate]);
+
   if (success) {
     return (
       <Box
@@ -219,16 +229,6 @@ const Signup = () => {
       </Box>
     );
   }
-
-  // Auto-redirect after 3 seconds
-  React.useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => {
-        navigate('/dashboard');
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success, navigate]);
 
   return (
     <Box

@@ -3,6 +3,7 @@ package com.todoapp.backend.controller;
 import com.todoapp.backend.dto.UserDto;
 import com.todoapp.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

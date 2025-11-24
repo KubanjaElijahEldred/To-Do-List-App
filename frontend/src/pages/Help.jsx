@@ -50,7 +50,7 @@ const Help = () => {
             </Typography>
             
             <Grid container spacing={4}>
-              <Grid item xs={12} md={8}>
+              <Grid>
                 <Section>
                   <Typography variant="h5" sx={{ 
                     fontWeight: 'bold',
@@ -102,7 +102,7 @@ const Help = () => {
                 </Section>
               </Grid>
               
-              <Grid item xs={12} md={4}>
+              <Grid>
                 <Section>
                   <Paper elevation={0} sx={{ 
                     p: 3, 

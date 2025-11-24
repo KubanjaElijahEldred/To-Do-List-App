@@ -32,7 +32,7 @@ public class TeamService {
         return teamMemberRepository.save(member);
     }
 
-    public TeamMember updateTeamMember(Long id, TeamController.TeamMemberRequest request) {
+    public TeamMember updateTeamMember(Long id, TeamMemberRequest request) {
         Optional<TeamMember> memberOpt = teamMemberRepository.findById(id);
         if (memberOpt.isEmpty()) {
             throw new RuntimeException("Team member not found");
@@ -56,5 +56,26 @@ public class TeamService {
 
     public List<TeamMember> searchTeamMembers(String query) {
         return teamMemberRepository.findByNameContainingIgnoreCase(query);
+    }
+    
+    // DTO class for team member requests
+    public static class TeamMemberRequest {
+        private String name;
+        private String email;
+        private String phone;
+        private String role;
+
+        // Getters and Setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
+
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
     }
 }

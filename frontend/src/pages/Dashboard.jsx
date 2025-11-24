@@ -374,7 +374,7 @@ const Dashboard = () => {
 
         {/* Stats Grid */}
         <Grid container spacing={0} sx={{ mb: 4 }}>
-          <Grid xs={12} sm={6} lg={3} xl={3}>
+          <Grid>
             <StatCard 
               title="Total Tasks" 
               value={tasks.length.toString()} 
@@ -385,7 +385,7 @@ const Dashboard = () => {
               onDelete={() => {}}
             />
           </Grid>
-          <Grid xs={12} sm={6} lg={3} xl={3}>
+          <Grid>
             <StatCard 
               title="Steps" 
               value="12,548" 
@@ -394,7 +394,7 @@ const Dashboard = () => {
               unit="steps"
             />
           </Grid>
-          <Grid xs={12} sm={6} lg={3} xl={3}>
+          <Grid>
             <StatCard 
               title="Heart Rate" 
               value="128" 
@@ -403,7 +403,7 @@ const Dashboard = () => {
               unit="bpm"
             />
           </Grid>
-          <Grid xs={12} sm={6} lg={3} xl={3}>
+          <Grid>
             <StatCard 
               title="Water Intake" 
               value="2.5" 

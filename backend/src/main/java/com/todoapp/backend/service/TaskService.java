@@ -48,7 +48,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Task updateTask(Long id, TaskController.TaskRequest request, String email) {
+    public Task updateTask(Long id, TaskRequest request, String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -67,7 +67,7 @@ public class TaskService {
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         if (request.getPriority() != null) {
-            task.setPriority(request.getPriority());
+            task.setPriority(Task.TaskPriority.valueOf(request.getPriority().toUpperCase()));
         }
         
         if (request.getDueDate() != null && !request.getDueDate().isEmpty()) {
@@ -115,5 +115,30 @@ public class TaskService {
 
         task.setStatus(status);
         return taskRepository.save(task);
+    }
+    
+    // DTO class for task requests
+    public static class TaskRequest {
+        private String title;
+        private String description;
+        private String priority;
+        private String status;
+        private String dueDate;
+
+        // Getters and Setters
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
+
+        public String getPriority() { return priority; }
+        public void setPriority(String priority) { this.priority = priority; }
+
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+
+        public String getDueDate() { return dueDate; }
+        public void setDueDate(String dueDate) { this.dueDate = dueDate; }
     }
 }
