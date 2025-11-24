@@ -21,6 +21,14 @@ import {
   Grid,
   InputAdornment,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  FormControl,
+  InputLabel,
+  Badge,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import {
@@ -36,10 +44,16 @@ import {
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
   FilterList as FilterListIcon,
-  Sort as SortIcon
+  Sort as SortIcon,
+  Label as LabelIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import PageLayout from '../components/layout/PageLayout';
 import PageHeader from '../components/common/PageHeader';
+import TaskReminder from '../components/notifications/TaskReminder';
+import SubtaskList from '../components/tasks/SubtaskList';
+import TaskTemplates from '../components/tasks/TaskTemplates';
+import TimeTracker from '../components/tasks/TimeTracker';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -69,6 +83,40 @@ const Tasks = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  
+  // Templates state
+  const [templates, setTemplates] = useState([
+    {
+      id: 1,
+      name: 'Weekly Planning',
+      description: 'Plan your week with this template',
+      category: 'personal',
+      priority: 'medium',
+      subtasks: [
+        { id: 101, title: 'Review last week accomplishments', completed: false },
+        { id: 102, title: 'Set weekly goals', completed: false },
+        { id: 103, title: 'Schedule important meetings', completed: false }
+      ],
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      name: 'Code Review',
+      description: 'Standard code review process',
+      category: 'development',
+      priority: 'high',
+      subtasks: [
+        { id: 201, title: 'Check code style and formatting', completed: false },
+        { id: 202, title: 'Review logic and algorithms', completed: false },
+        { id: 203, title: 'Run tests', completed: false },
+        { id: 204, title: 'Check for security issues', completed: false }
+      ],
+      createdAt: new Date().toISOString()
+    }
+  ]);
   
   // Task state
   const [tasks, setTasks] = useState([
@@ -78,7 +126,14 @@ const Tasks = () => {
       completed: false, 
       important: true, 
       priority: 'high',
-      dueDate: '2023-11-25'
+      dueDate: '2023-11-25',
+      category: 'work',
+      description: 'Finish the Q4 project proposal and send to team',
+      subtasks: [
+        { id: 101, title: 'Research market trends', completed: true },
+        { id: 102, title: 'Write executive summary', completed: false },
+        { id: 103, title: 'Create budget section', completed: false }
+      ]
     },
     { 
       id: 2, 
@@ -86,7 +141,13 @@ const Tasks = () => {
       completed: true, 
       important: false, 
       priority: 'medium',
-      dueDate: '2023-11-20'
+      dueDate: '2023-11-20',
+      category: 'development',
+      description: 'Review and merge pending PRs',
+      subtasks: [
+        { id: 201, title: 'Check functionality', completed: true },
+        { id: 202, title: 'Run tests', completed: true }
+      ]
     },
     { 
       id: 3, 
@@ -94,20 +155,55 @@ const Tasks = () => {
       completed: false, 
       important: true, 
       priority: 'low',
-      dueDate: '2023-11-30'
+      dueDate: '2023-11-30',
+      category: 'documentation',
+      description: 'Update API documentation for new endpoints',
+      subtasks: []
     },
+  ]);
+  
+  // Categories state
+  const [categories] = useState([
+    { id: 'work', name: 'Work', color: '#1976d2' },
+    { id: 'personal', name: 'Personal', color: '#388e3c' },
+    { id: 'development', name: 'Development', color: '#7b1fa2' },
+    { id: 'documentation', name: 'Documentation', color: '#f57c00' },
+    { id: 'shopping', name: 'Shopping', color: '#d32f2f' },
+  ]);
+  
+  // Time tracking state
+  const [timeEntries, setTimeEntries] = useState([
+    {
+      id: 1,
+      taskId: 1,
+      startTime: new Date(Date.now() - 3600000).toISOString(),
+      endTime: new Date(Date.now() - 1800000).toISOString(),
+      duration: 1800000, // 30 minutes
+      isActive: false
+    },
+    {
+      id: 2,
+      taskId: 2,
+      startTime: new Date(Date.now() - 900000).toISOString(),
+      endTime: null,
+      duration: 900000, // 15 minutes so far
+      isActive: true
+    }
   ]);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [newTask, setNewTask] = useState('');
 
-  // Filter tasks based on active tab
+  // Filter tasks based on active tab and category
   const filteredTasks = tasks.filter(task => {
     if (activeTab === 'active') return !task.completed;
     if (activeTab === 'completed') return task.completed;
     if (activeTab === 'important') return task.important;
     return true; // 'all' tab
+  }).filter(task => {
+    if (categoryFilter === 'all') return true;
+    return task.category === categoryFilter;
   });
   
   // Filter by search query
@@ -127,11 +223,139 @@ const Tasks = () => {
       important: false,
       priority: 'medium',
       dueDate: null,
+      category: 'personal',
+      description: '',
+      subtasks: [],
       createdAt: new Date().toISOString()
     };
     
     setTasks([newTaskItem, ...tasks]);
     setNewTask('');
+  };
+
+  // Subtask handlers
+  const handleAddSubtask = (taskId, subtask) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          subtasks: [...(task.subtasks || []), subtask]
+        };
+      }
+      return task;
+    }));
+  };
+
+  const handleUpdateSubtask = (taskId, subtaskId, updatedSubtask) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          subtasks: task.subtasks.map(st => 
+            st.id === subtaskId ? updatedSubtask : st
+          )
+        };
+      }
+      return task;
+    }));
+  };
+
+  const handleDeleteSubtask = (taskId, subtaskId) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          subtasks: task.subtasks.filter(st => st.id !== subtaskId)
+        };
+      }
+      return task;
+    }));
+  };
+
+  // Update task category
+  const updateTaskCategory = (taskId, category) => {
+    setTasks(tasks.map(task =>
+      task.id === taskId ? { ...task, category } : task
+    ));
+    setShowCategoryDialog(false);
+    setEditingTask(null);
+  };
+
+  // Get category by id
+  const getCategoryById = (categoryId) => {
+    return categories.find(cat => cat.id === categoryId) || { name: 'Uncategorized', color: '#666' };
+  };
+
+  // Template handlers
+  const handleCreateTemplate = (template) => {
+    setTemplates([...templates, template]);
+  };
+
+  const handleEditTemplate = (updatedTemplate) => {
+    setTemplates(templates.map(template => 
+      template.id === updatedTemplate.id ? updatedTemplate : template
+    ));
+  };
+
+  const handleDeleteTemplate = (templateId) => {
+    setTemplates(templates.filter(template => template.id !== templateId));
+  };
+
+  const handleUseTemplate = (template) => {
+    const newTask = {
+      id: Date.now(),
+      title: template.name,
+      description: template.description,
+      category: template.category,
+      priority: template.priority,
+      completed: false,
+      important: false,
+      dueDate: null,
+      subtasks: template.subtasks.map(st => ({
+        ...st,
+        id: Date.now() + Math.random(),
+        completed: false
+      })),
+      createdAt: new Date().toISOString()
+    };
+    setTasks([newTask, ...tasks]);
+  };
+
+  // Time tracking handlers
+  const handleStartTimer = (taskId) => {
+    const newEntry = {
+      id: Date.now(),
+      taskId,
+      startTime: new Date().toISOString(),
+      endTime: null,
+      duration: 0,
+      isActive: true
+    };
+    setTimeEntries([...timeEntries, newEntry]);
+  };
+
+  const handleStopTimer = (taskId, entryId) => {
+    const entry = timeEntries.find(e => e.id === entryId);
+    if (entry) {
+      const endTime = new Date().toISOString();
+      const duration = new Date(endTime) - new Date(entry.startTime);
+      
+      setTimeEntries(timeEntries.map(e => 
+        e.id === entryId 
+          ? { ...e, endTime, duration, isActive: false }
+          : e
+      ));
+    }
+  };
+
+  const handleUpdateTimeEntry = (entryId, updates) => {
+    setTimeEntries(timeEntries.map(entry => 
+      entry.id === entryId ? { ...entry, ...updates } : entry
+    ));
+  };
+
+  const handleDeleteTimeEntry = (entryId) => {
+    setTimeEntries(timeEntries.filter(entry => entry.id !== entryId));
   };
 
   // Toggle task completion
@@ -218,6 +442,15 @@ const Tasks = () => {
             </Button>
           </>
         }
+      />
+
+      {/* Task Templates */}
+      <TaskTemplates
+        templates={templates}
+        onCreateTemplate={handleCreateTemplate}
+        onEditTemplate={handleEditTemplate}
+        onDeleteTemplate={handleDeleteTemplate}
+        onUseTemplate={handleUseTemplate}
       />
 
       {/* Search and filter */}
@@ -348,7 +581,34 @@ const Tasks = () => {
           <Typography variant="body2" color="text.secondary">
             {searchedTasks.length} {searchedTasks.length === 1 ? 'task' : 'tasks'} found
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={categoryFilter}
+                label="Category"
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                startAdornment={<LabelIcon fontSize="small" sx={{ mr: 1 }} />}
+              >
+                <MenuItem value="all">All Categories</MenuItem>
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: '50%',
+                          backgroundColor: category.color,
+                          mr: 1,
+                        }}
+                      />
+                      {category.name}
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Button 
               size="small" 
               startIcon={<FilterListIcon />}
@@ -389,13 +649,24 @@ const Tasks = () => {
               <React.Fragment key={task.id}>
                 <ListItem
                   secondaryAction={
-                    <IconButton
-                      edge="end"
-                      aria-label="more"
-                      onClick={(e) => handleMenuClick(e, task)}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TimeTracker
+                        taskId={task.id}
+                        taskTitle={task.title}
+                        timeEntries={timeEntries}
+                        onStartTimer={handleStartTimer}
+                        onStopTimer={handleStopTimer}
+                        onUpdateTimeEntry={handleUpdateTimeEntry}
+                        onDeleteTimeEntry={handleDeleteTimeEntry}
+                      />
+                      <IconButton
+                        edge="end"
+                        aria-label="more"
+                        onClick={(e) => handleMenuClick(e, task)}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
+                    </Box>
                   }
                   sx={{
                     '&:hover': {
@@ -428,14 +699,40 @@ const Tasks = () => {
                         <Typography variant="body2" color="textSecondary" component="span">
                           {task.description}
                         </Typography>
-                        <Box component="span" sx={{ ml: 1 }}>
+                        <Box component="span" sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                           <PriorityChip priority={task.priority} />
+                          {task.category && (
+                            <Chip
+                              icon={<LabelIcon fontSize="small" />}
+                              label={getCategoryById(task.category).name}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                borderColor: getCategoryById(task.category).color,
+                                color: getCategoryById(task.category).color,
+                                '& .MuiChip-icon': {
+                                  color: getCategoryById(task.category).color,
+                                },
+                              }}
+                              onClick={() => {
+                                setEditingTask(task);
+                                setShowCategoryDialog(true);
+                              }}
+                            />
+                          )}
                         </Box>
                       </>
                     }
                   />
                 </ListItem>
                 <Divider component="li" />
+                <SubtaskList
+                  subtasks={task.subtasks || []}
+                  onAddSubtask={handleAddSubtask}
+                  onUpdateSubtask={handleUpdateSubtask}
+                  onDeleteSubtask={handleDeleteSubtask}
+                  taskId={task.id}
+                />
               </React.Fragment>
             ))
           )}
@@ -446,7 +743,7 @@ const Tasks = () => {
             <Grid key={task.id}>
               <StyledPaper>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                  <Box>
+                  <Box sx={{ flex: 1 }}>
                     <Typography 
                       variant="subtitle1" 
                       sx={{
@@ -456,7 +753,7 @@ const Tasks = () => {
                     >
                       {task.title}
                     </Typography>
-                    <Box display="flex" alignItems="center" mt={1} gap={1}>
+                    <Box display="flex" alignItems="center" mt={1} gap={1} flexWrap="wrap">
                       {task.dueDate && (
                         <Chip
                           icon={<TodayIcon fontSize="small" />}
@@ -466,14 +763,44 @@ const Tasks = () => {
                         />
                       )}
                       <PriorityChip priority={task.priority} />
+                      {task.category && (
+                        <Chip
+                          icon={<LabelIcon fontSize="small" />}
+                          label={getCategoryById(task.category).name}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            borderColor: getCategoryById(task.category).color,
+                            color: getCategoryById(task.category).color,
+                            '& .MuiChip-icon': {
+                              color: getCategoryById(task.category).color,
+                            },
+                          }}
+                          onClick={() => {
+                            setEditingTask(task);
+                            setShowCategoryDialog(true);
+                          }}
+                        />
+                      )}
                     </Box>
                   </Box>
-                  <IconButton 
-                    size="small"
-                    onClick={(e) => handleMenuClick(e, task)}
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                    <TimeTracker
+                      taskId={task.id}
+                      taskTitle={task.title}
+                      timeEntries={timeEntries}
+                      onStartTimer={handleStartTimer}
+                      onStopTimer={handleStopTimer}
+                      onUpdateTimeEntry={handleUpdateTimeEntry}
+                      onDeleteTimeEntry={handleDeleteTimeEntry}
+                    />
+                    <IconButton 
+                      size="small"
+                      onClick={(e) => handleMenuClick(e, task)}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
                 <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
                   <Checkbox
@@ -492,6 +819,13 @@ const Tasks = () => {
                     </IconButton>
                   </Box>
                 </Box>
+                <SubtaskList
+                  subtasks={task.subtasks || []}
+                  onAddSubtask={handleAddSubtask}
+                  onUpdateSubtask={handleUpdateSubtask}
+                  onDeleteSubtask={handleDeleteSubtask}
+                  taskId={task.id}
+                />
               </StyledPaper>
             </Grid>
           ))}
@@ -513,6 +847,15 @@ const Tasks = () => {
         }}
       >
         <MenuItem onClick={() => {
+          if (selectedTask) {
+            setEditingTask(selectedTask);
+            setShowCategoryDialog(true);
+          }
+          handleMenuClose();
+        }}>
+          Change Category
+        </MenuItem>
+        <MenuItem onClick={() => {
           if (selectedTask) toggleImportant(selectedTask.id);
           handleMenuClose();
         }}>
@@ -530,6 +873,62 @@ const Tasks = () => {
           Delete Task
         </MenuItem>
       </Menu>
+
+        {/* Category Selection Dialog */}
+      <Dialog open={showCategoryDialog} onClose={() => setShowCategoryDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h6">Select Category</Typography>
+            <IconButton onClick={() => setShowCategoryDialog(false)} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Choose a category for: <strong>{editingTask?.title}</strong>
+          </Typography>
+          <Grid container spacing={2}>
+            {categories.map((category) => (
+              <Grid key={category.id} xs={6} sm={4}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    cursor: 'pointer',
+                    border: editingTask?.category === category.id ? 2 : 1,
+                    borderColor: editingTask?.category === category.id ? category.color : 'divider',
+                    backgroundColor: editingTask?.category === category.id ? `${category.color}08` : 'background.paper',
+                    '&:hover': {
+                      backgroundColor: `${category.color}12`,
+                    },
+                  }}
+                  onClick={() => updateTaskCategory(editingTask?.id, category.id)}
+                >
+                  <Box display="flex" alignItems="center" flexDirection="column" gap={1}>
+                    <Box
+                      sx={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: '50%',
+                        backgroundColor: category.color,
+                      }}
+                    />
+                    <Typography variant="body2" align="center">
+                      {category.name}
+                    </Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowCategoryDialog(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Task Reminders */}
+      <TaskReminder tasks={tasks} />
     </PageLayout>
   );
 };
