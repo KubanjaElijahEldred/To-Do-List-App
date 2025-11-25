@@ -47,6 +47,7 @@ import {
   Sort as SortIcon,
   Label as LabelIcon,
   Close as CloseIcon,
+  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import PageLayout from '../components/layout/PageLayout';
 import PageHeader from '../components/common/PageHeader';
@@ -56,6 +57,7 @@ import TaskTemplates from '../components/tasks/TaskTemplates';
 import TimeTracker from '../components/tasks/TimeTracker';
 import TaskLabels from '../components/tasks/TaskLabels';
 import TaskSearchFilter from '../components/tasks/TaskSearchFilter';
+import TaskStatistics from '../components/tasks/TaskStatistics';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -88,6 +90,7 @@ const Tasks = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [showStats, setShowStats] = useState(false);
   
   // Templates state
   const [templates, setTemplates] = useState([
@@ -569,9 +572,26 @@ const Tasks = () => {
             >
               Add Task
             </Button>
+            <Button
+              variant="outlined"
+              startIcon={<TrendingUpIcon />}
+              onClick={() => setShowStats(!showStats)}
+            >
+              {showStats ? 'Hide Stats' : 'Show Stats'}
+            </Button>
           </>
         }
       />
+
+      {/* Task Statistics Dashboard */}
+      {showStats && (
+        <TaskStatistics
+          tasks={tasks}
+          timeEntries={timeEntries}
+          categories={categories}
+          labels={availableLabels}
+        />
+      )}
 
       {/* Task Templates */}
       <TaskTemplates
