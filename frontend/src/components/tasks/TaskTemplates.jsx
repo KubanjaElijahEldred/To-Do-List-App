@@ -26,7 +26,7 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Template as TemplateIcon,
+  Dashboard as TemplateIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   ContentCopy as ContentCopyIcon,

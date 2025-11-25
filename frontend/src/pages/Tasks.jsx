@@ -54,6 +54,7 @@ import TaskReminder from '../components/notifications/TaskReminder';
 import SubtaskList from '../components/tasks/SubtaskList';
 import TaskTemplates from '../components/tasks/TaskTemplates';
 import TimeTracker from '../components/tasks/TimeTracker';
+import TaskLabels from '../components/tasks/TaskLabels';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -129,6 +130,7 @@ const Tasks = () => {
       dueDate: '2023-11-25',
       category: 'work',
       description: 'Finish the Q4 project proposal and send to team',
+      labels: [availableLabels[0], availableLabels[1]], // Bug, Feature
       subtasks: [
         { id: 101, title: 'Research market trends', completed: true },
         { id: 102, title: 'Write executive summary', completed: false },
@@ -144,6 +146,7 @@ const Tasks = () => {
       dueDate: '2023-11-20',
       category: 'development',
       description: 'Review and merge pending PRs',
+      labels: [availableLabels[2]], // Enhancement
       subtasks: [
         { id: 201, title: 'Check functionality', completed: true },
         { id: 202, title: 'Run tests', completed: true }
@@ -158,6 +161,7 @@ const Tasks = () => {
       dueDate: '2023-11-30',
       category: 'documentation',
       description: 'Update API documentation for new endpoints',
+      labels: [availableLabels[3]], // Documentation
       subtasks: []
     },
   ]);
@@ -169,6 +173,14 @@ const Tasks = () => {
     { id: 'development', name: 'Development', color: '#7b1fa2' },
     { id: 'documentation', name: 'Documentation', color: '#f57c00' },
     { id: 'shopping', name: 'Shopping', color: '#d32f2f' },
+  ]);
+  
+  // Labels state
+  const [availableLabels, setAvailableLabels] = useState([
+    { id: 1, name: 'Bug', color: '#d32f2f', createdAt: new Date().toISOString() },
+    { id: 2, name: 'Feature', color: '#1976d2', createdAt: new Date().toISOString() },
+    { id: 3, name: 'Enhancement', color: '#388e3c', createdAt: new Date().toISOString() },
+    { id: 4, name: 'Documentation', color: '#f57c00', createdAt: new Date().toISOString() },
   ]);
   
   // Time tracking state
@@ -319,6 +331,49 @@ const Tasks = () => {
       createdAt: new Date().toISOString()
     };
     setTasks([newTask, ...tasks]);
+  };
+
+  // Label handlers
+  const handleAddLabel = (taskId, label) => {
+    setTasks(tasks.map(task => {
+      if (task.id === taskId) {
+        const existingLabels = task.labels || [];
+        const isLabelAlreadyAdded = existingLabels.some(l => l.id === label.id);
+        if (!isLabelAlreadyAdded) {
+          return {
+            ...task,
+            labels: [...existingLabels, label]
+          };
+        }
+      }
+      return task;
+    }));
+  };
+
+  const handleRemoveLabel = (taskId, labelId, deleteGlobally = false) => {
+    if (deleteGlobally) {
+      // Remove label from available labels and all tasks
+      setAvailableLabels(availableLabels.filter(label => label.id !== labelId));
+      setTasks(tasks.map(task => ({
+        ...task,
+        labels: (task.labels || []).filter(label => label.id !== labelId)
+      })));
+    } else {
+      // Remove label only from specific task
+      setTasks(tasks.map(task => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            labels: (task.labels || []).filter(label => label.id !== labelId)
+          };
+        }
+        return task;
+      }));
+    }
+  };
+
+  const handleCreateLabel = (newLabel) => {
+    setAvailableLabels([...availableLabels, newLabel]);
   };
 
   // Time tracking handlers
@@ -695,7 +750,7 @@ const Tasks = () => {
                       </Typography>
                     }
                     secondary={
-                      <>
+                      <Box component="span">
                         <Typography variant="body2" color="textSecondary" component="span">
                           {task.description}
                         </Typography>
@@ -721,7 +776,15 @@ const Tasks = () => {
                             />
                           )}
                         </Box>
-                      </>
+                        <TaskLabels
+                          taskId={task.id}
+                          taskLabels={task.labels || []}
+                          availableLabels={availableLabels}
+                          onAddLabel={handleAddLabel}
+                          onRemoveLabel={handleRemoveLabel}
+                          onCreateLabel={handleCreateLabel}
+                        />
+                      </Box>
                     }
                   />
                 </ListItem>
@@ -783,6 +846,14 @@ const Tasks = () => {
                         />
                       )}
                     </Box>
+                    <TaskLabels
+                      taskId={task.id}
+                      taskLabels={task.labels || []}
+                      availableLabels={availableLabels}
+                      onAddLabel={handleAddLabel}
+                      onRemoveLabel={handleRemoveLabel}
+                      onCreateLabel={handleCreateLabel}
+                    />
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
                     <TimeTracker
