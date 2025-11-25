@@ -58,6 +58,7 @@ import TimeTracker from '../components/tasks/TimeTracker';
 import TaskLabels from '../components/tasks/TaskLabels';
 import TaskSearchFilter from '../components/tasks/TaskSearchFilter';
 import TaskStatistics from '../components/tasks/TaskStatistics';
+import TaskExportImport from '../components/tasks/TaskExportImport';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -490,6 +491,17 @@ const Tasks = () => {
     setTimeEntries(timeEntries.filter(entry => entry.id !== entryId));
   };
 
+  // Import/Export handlers
+  const handleImportTasks = (importedTasks, options) => {
+    if (options.mergeWithExisting) {
+      // Merge with existing tasks
+      setTasks([...tasks, ...importedTasks]);
+    } else {
+      // Replace all tasks
+      setTasks(importedTasks);
+    }
+  };
+
   // Toggle task completion
   const toggleTask = (taskId) => {
     setTasks(tasks.map(task =>
@@ -582,6 +594,15 @@ const Tasks = () => {
           </>
         }
       />
+
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <TaskExportImport
+          tasks={tasks}
+          categories={categories}
+          labels={availableLabels}
+          onImportTasks={handleImportTasks}
+        />
+      </Box>
 
       {/* Task Statistics Dashboard */}
       {showStats && (
