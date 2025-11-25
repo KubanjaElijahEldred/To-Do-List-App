@@ -20,7 +20,6 @@ import {
   List,
   ListItem,
   ListItemIcon,
-  ListItemText,
 } from '@mui/material';
 import {
   Download as DownloadIcon,
