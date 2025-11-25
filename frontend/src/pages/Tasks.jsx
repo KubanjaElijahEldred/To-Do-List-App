@@ -55,6 +55,7 @@ import SubtaskList from '../components/tasks/SubtaskList';
 import TaskTemplates from '../components/tasks/TaskTemplates';
 import TimeTracker from '../components/tasks/TimeTracker';
 import TaskLabels from '../components/tasks/TaskLabels';
+import TaskSearchFilter from '../components/tasks/TaskSearchFilter';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -206,13 +207,86 @@ const Tasks = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [newTask, setNewTask] = useState('');
+  
+  // Search and filter state
+  const [filters, setFilters] = useState({
+    priority: 'all',
+    category: 'all',
+    labels: [],
+    dateRange: 'all',
+    hasSubtasks: 'all',
+    timeTracked: 'all'
+  });
 
-  // Filter tasks based on active tab and category
+  // Filter tasks based on active tab, category, and advanced filters
   const filteredTasks = tasks.filter(task => {
+    // Tab filter
     if (activeTab === 'active') return !task.completed;
     if (activeTab === 'completed') return task.completed;
     if (activeTab === 'important') return task.important;
-    return true; // 'all' tab
+    
+    // Advanced filters
+    // Priority filter
+    if (filters.priority !== 'all' && task.priority !== filters.priority) return false;
+    
+    // Category filter
+    if (filters.category !== 'all' && task.category !== filters.category) return false;
+    
+    // Labels filter
+    if (filters.labels.length > 0) {
+      const taskLabelIds = (task.labels || []).map(l => l.id);
+      const filterLabelIds = filters.labels.map(l => l.id);
+      const hasRequiredLabel = filterLabelIds.some(id => taskLabelIds.includes(id));
+      if (!hasRequiredLabel) return false;
+    }
+    
+    // Date range filter
+    if (filters.dateRange !== 'all' && task.dueDate) {
+      const taskDate = new Date(task.dueDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const thisWeekEnd = new Date(today);
+      thisWeekEnd.setDate(today.getDate() + 7);
+      const nextWeekEnd = new Date(today);
+      nextWeekEnd.setDate(today.getDate() + 14);
+      
+      switch (filters.dateRange) {
+        case 'today':
+          if (taskDate < today || taskDate >= tomorrow) return false;
+          break;
+        case 'tomorrow':
+          if (taskDate < tomorrow || taskDate >= new Date(tomorrow.getTime() + 86400000)) return false;
+          break;
+        case 'thisWeek':
+          if (taskDate < today || taskDate >= thisWeekEnd) return false;
+          break;
+        case 'nextWeek':
+          if (taskDate < thisWeekEnd || taskDate >= nextWeekEnd) return false;
+          break;
+        case 'overdue':
+          if (taskDate >= today) return false;
+          break;
+      }
+    }
+    
+    // Subtasks filter
+    if (filters.hasSubtasks !== 'all') {
+      const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+      if (filters.hasSubtasks === 'with' && !hasSubtasks) return false;
+      if (filters.hasSubtasks === 'without' && hasSubtasks) return false;
+    }
+    
+    // Time tracked filter
+    if (filters.timeTracked !== 'all') {
+      // This would need timeEntries data, for now using placeholder logic
+      const hasTimeTracked = false; // TODO: Implement actual time tracking check
+      if (filters.timeTracked === 'with' && !hasTimeTracked) return false;
+      if (filters.timeTracked === 'without' && hasTimeTracked) return false;
+    }
+    
+    return true; // 'all' tab or passed all filters
   }).filter(task => {
     if (categoryFilter === 'all') return true;
     return task.category === categoryFilter;
@@ -508,7 +582,15 @@ const Tasks = () => {
         onUseTemplate={handleUseTemplate}
       />
 
-      {/* Search and filter */}
+      {/* Task Search and Filter */}
+      <TaskSearchFilter
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        filters={filters}
+        onFiltersChange={setFilters}
+        availableLabels={availableLabels}
+        availableCategories={categories}
+      />
       <Box sx={{ mb: 3 }}>
         <form onSubmit={handleAddTask}>
           <TextField
@@ -519,31 +601,11 @@ const Tasks = () => {
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AddIcon color="action" />
-                </InputAdornment>
-              ),
+              startAdornment: <AddIcon sx={{ color: 'text.secondary', mr: 1 }} />,
             }}
+            sx={{ mb: 3 }}
           />
         </form>
-      </Box>
-      
-      <Box sx={{ mb: 3 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search tasks..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
-          }}
-        />
       </Box>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
