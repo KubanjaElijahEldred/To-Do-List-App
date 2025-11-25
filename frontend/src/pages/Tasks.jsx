@@ -695,7 +695,7 @@ const Tasks = () => {
                       </Typography>
                     }
                     secondary={
-                      <>
+                      <Box component="span">
                         <Typography variant="body2" color="textSecondary" component="span">
                           {task.description}
                         </Typography>
@@ -721,7 +721,7 @@ const Tasks = () => {
                             />
                           )}
                         </Box>
-                      </>
+                      </Box>
                     }
                   />
                 </ListItem>
