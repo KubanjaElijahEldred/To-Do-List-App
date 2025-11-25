@@ -124,6 +124,14 @@ const Tasks = () => {
     }
   ]);
   
+  // Labels state
+  const [availableLabels, setAvailableLabels] = useState([
+    { id: 1, name: 'Bug', color: '#d32f2f', createdAt: new Date().toISOString() },
+    { id: 2, name: 'Feature', color: '#1976d2', createdAt: new Date().toISOString() },
+    { id: 3, name: 'Enhancement', color: '#388e3c', createdAt: new Date().toISOString() },
+    { id: 4, name: 'Documentation', color: '#f57c00', createdAt: new Date().toISOString() },
+  ]);
+  
   // Task state
   const [tasks, setTasks] = useState([
     { 
@@ -178,14 +186,6 @@ const Tasks = () => {
     { id: 'development', name: 'Development', color: '#7b1fa2' },
     { id: 'documentation', name: 'Documentation', color: '#f57c00' },
     { id: 'shopping', name: 'Shopping', color: '#d32f2f' },
-  ]);
-  
-  // Labels state
-  const [availableLabels, setAvailableLabels] = useState([
-    { id: 1, name: 'Bug', color: '#d32f2f', createdAt: new Date().toISOString() },
-    { id: 2, name: 'Feature', color: '#1976d2', createdAt: new Date().toISOString() },
-    { id: 3, name: 'Enhancement', color: '#388e3c', createdAt: new Date().toISOString() },
-    { id: 4, name: 'Documentation', color: '#f57c00', createdAt: new Date().toISOString() },
   ]);
   
   // Time tracking state
