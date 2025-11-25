@@ -124,13 +124,16 @@ const Tasks = () => {
     }
   ]);
   
-  // Labels state
-  const [availableLabels, setAvailableLabels] = useState([
+  // Define labels as constant first
+  const initialLabels = [
     { id: 1, name: 'Bug', color: '#d32f2f', createdAt: new Date().toISOString() },
     { id: 2, name: 'Feature', color: '#1976d2', createdAt: new Date().toISOString() },
     { id: 3, name: 'Enhancement', color: '#388e3c', createdAt: new Date().toISOString() },
     { id: 4, name: 'Documentation', color: '#f57c00', createdAt: new Date().toISOString() },
-  ]);
+  ];
+  
+  // Labels state
+  const [availableLabels, setAvailableLabels] = useState(initialLabels);
   
   // Task state
   const [tasks, setTasks] = useState([
@@ -143,7 +146,7 @@ const Tasks = () => {
       dueDate: '2023-11-25',
       category: 'work',
       description: 'Finish the Q4 project proposal and send to team',
-      labels: [availableLabels[0], availableLabels[1]], // Bug, Feature
+      labels: [initialLabels[0], initialLabels[1]], // Bug, Feature
       subtasks: [
         { id: 101, title: 'Research market trends', completed: true },
         { id: 102, title: 'Write executive summary', completed: false },
@@ -159,7 +162,7 @@ const Tasks = () => {
       dueDate: '2023-11-20',
       category: 'development',
       description: 'Review and merge pending PRs',
-      labels: [availableLabels[2]], // Enhancement
+      labels: [initialLabels[2]], // Enhancement
       subtasks: [
         { id: 201, title: 'Check functionality', completed: true },
         { id: 202, title: 'Run tests', completed: true }
@@ -174,7 +177,7 @@ const Tasks = () => {
       dueDate: '2023-11-30',
       category: 'documentation',
       description: 'Update API documentation for new endpoints',
-      labels: [availableLabels[3]], // Documentation
+      labels: [initialLabels[3]], // Documentation
       subtasks: []
     },
   ]);
